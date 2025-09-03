@@ -125,200 +125,337 @@
 
   <main class="wrap">
     <article aria-label="Solo RPG Notation SRD content">
-      <h1 id="srd-top">Solo RPG Notation SRD<br /><em style="font-style:italic;">A Standard for Recording Solo Play</em></h1>
-
-      <hr />
-
-      <h2 id="introduction">Introduction</h2>
-      <p>Solo RPG play often produces rich stories, but recording them can be messy.<br />
+      <h1 id="solo-rpg-notation-srd">Solo RPG Notation SRD</h1>
+      <p><em>A Standard for Recording Solo Play</em></p>
+      <h2 id="1-introduction">1. Introduction</h2>
+      <p>Solo RPG play often produces rich stories, but recording them can be messy.<br>
       This standard notation system provides a <strong>shorthand method</strong> to capture the essentials of play while leaving space for optional narrative, dialogue, and campaign tracking.</p>
-
       <p>The notation is designed to be:</p>
       <ul>
-        <li><strong>Flexible</strong> — usable across different systems.</li>
-        <li><strong>Layered</strong> — works as both quick shorthand or expanded narrative.</li>
-        <li><strong>Searchable</strong> — tags and codes make it easy to track NPCs, events, and locations.</li>
+      <li><strong>Flexible</strong> — usable across different systems.</li>
+      <li><strong>Layered</strong> — works as both quick shorthand or expanded narrative.</li>
+      <li><strong>Searchable</strong> — tags and codes make it easy to track NPCs, events, and locations.</li>
       </ul>
-
-      <hr />
-
-      <h2 id="1-scenes">1. Scenes</h2>
+      <h2 id="2-front-matter">2. Front Matter</h2>
+      <p>Use this block at the start of a campaign log to record essential details.</p>
+      <h3 id="campaign-header">Campaign Header</h3>
+      <pre class="hljs"><code><div>=== Campaign Log: Campaign Title ===
+      [Title]        Campaign Title
+      [Ruleset]      Ruleset and tools used
+      [Genre]        
+      [Player]       
+      [PCs]          
+      [Start Date]   yyyy-mm-dd
+      [Last Update]  yyyy-mm-dd
+      </div></code></pre>
+      <h3 id="optional-fields">Optional Fields</h3>
+      <ul>
+      <li><strong>[Tools]</strong> — Oracles, generators, house rules used</li>
+      <li><strong>[Themes]</strong> — Mystery, romance, cosmic horror…</li>
+      <li><strong>[Tone]</strong> — Gritty, light, surreal, etc.</li>
+      <li><strong>[Notes]</strong> — Any prep or expectations before play</li>
+      </ul>
+      <h3 id="example">Example</h3>
+      <pre class="hljs"><code><div>=== Campaign Log: Star Hauler ===
+      [Title]        Star Hauler
+      [Ruleset]      Loner Space
+      [Genre]        Space trading / sci-fi adventure
+      [Player]       Roberto
+      [PCs]          Captain Elara (PC:Elara|Ship: Rustwing)
+      [Start Date]   2025-09-03
+      [Last Update]  2025-09-03
+      [Tools]        Oracles: Mythic, Stars Without Number NPC tables
+      [Themes]       Trade, exploration, moral dilemmas
+      [Tone]         Pulpy with dark undertones
+      [Notes]        Starting on Argus Station, day after cargo strike.
+      </div></code></pre>
+      <h2 id="3-session-header">3. Session Header</h2>
+      <p>Use a short block at the start of each session to keep records tidy.</p>
+      <h3 id="basic-session-header">Basic Session Header</h3>
+      <pre class="hljs"><code><div>=== Session 1 ===
+      [Date]        2025-09-03
+      [Duration]    90 minutes
+      [Start Scene] S1
+      </div></code></pre>
+      <h3 id="optional-fields">Optional Fields</h3>
+      <ul>
+      <li><strong>[Recap]</strong> — Short note of previous events</li>
+      <li><strong>[Goals]</strong> — Player expectations for this session</li>
+      <li><strong>[Notes]</strong> — Table conditions, variants, mood</li>
+      </ul>
+      <h3 id="example">Example</h3>
+      <pre class="hljs"><code><div>=== Session 2 ===
+      [Date]        2025-09-10
+      [Duration]    2h
+      [Start Scene] S8
+      [Recap]       Jonah was captured at the lighthouse. Cultist plot at 3/6.
+      [Goals]       Rescue Jonah, follow clue from diary.
+      [Notes]       Trying new NPC reaction table.
+      </div></code></pre>
+      <h3 id="placement-of-boundaries">Placement of Boundaries</h3>
+      <ul>
+      <li>Always place <strong>Front Matter</strong> once, at the very start of the campaign log.</li>
+      <li>Start each play session with a <strong>Session Header</strong>.</li>
+      <li>End each play session with:<pre class="hljs"><code><div>=== Session X End ===
+      </div></code></pre>
+      </li>
+      <li>Update <code>[Last Update]</code> in the Front Matter each time a new Session Header is added.</li>
+      </ul>
+      <h2 id="4-scene-log">4. Scene Log</h2>
+      <h3 id="41-scenes">4.1 Scenes</h3>
       <p>Scenes are the basic unit of play.</p>
-
-      <pre><code>[S#] *Context / Frame*</code></pre>
-
+      <pre class="hljs"><code><div>[S#] *Context / Frame*
+      </div></code></pre>
       <ul>
-        <li><code>S#</code> = numbered scene (<code>[S1]</code>, <code>[S2]</code>, …).</li>
-        <li>Context = short description (<em>abandoned lighthouse, midnight</em>).</li>
-        <li>Use letters for flashbacks or branches: <code>[S3a]</code>.</li>
-        <li>Use thread IDs for parallel storylines: <code>[T2-S5]</code>.</li>
-        <li>Optional time markers: <code>⏳ Day 3</code>, <code>⏰ Midnight</code>.</li>
+      <li><code>S#</code> = numbered scene (<code>[S1]</code>, <code>[S2]</code>, …).</li>
+      <li>Context = short description (<em>abandoned lighthouse, midnight</em>).</li>
+      <li>Use letters for flashbacks or branches: <code>[S3a]</code>.</li>
+      <li>Use thread IDs for parallel storylines: <code>[T2-S5]</code>.</li>
+      <li>Optional time markers: <code>⏳ Day 3</code>, <code>⏰ Midnight</code>.</li>
       </ul>
-
-      <hr />
-
-      <h2 id="2-actions">2. Actions</h2>
+      <h3 id="42-actions">4.2 Actions</h3>
       <p>Two types of uncertainty drive play:</p>
-
       <ul>
-        <li><strong>Player-facing actions (mechanics)</strong>
-          <pre><code>▶ Pick the lock</code></pre>
-        </li>
-        <li><strong>World / GM questions (oracle)</strong>
-          <pre><code>? Is anyone inside?</code></pre>
-        </li>
+      <li><strong>Player-facing actions (mechanics)</strong><pre class="hljs"><code><div>▶ Pick the lock
+      </div></code></pre>
+      </li>
+      <li><strong>World / GM questions (oracle)</strong><pre class="hljs"><code><div>? Is anyone inside?
+      </div></code></pre>
+      </li>
       </ul>
-
-      <hr />
-
-      <h2 id="3-resolutions">3. Resolutions</h2>
-
-      <h3 id="mechanics">Mechanics</h3>
-      <pre><code>🎲 [roll or rule] → outcome</code></pre>
-      <p>Example:<br />
+      <h3 id="43-resolutions">4.3 Resolutions</h3>
+      <h4 id="mechanics">Mechanics</h4>
+      <pre class="hljs"><code><div>🎲 [roll or rule] → outcome
+      </div></code></pre>
+      <p>Example:<br>
       <code>🎲 d20+Lockpicking=17 vs DC 15 → Success</code></p>
-
-      <h3 id="oracle">Oracle</h3>
-      <pre><code>⤷ [answer] (roll if relevant)</code></pre>
-      <p>Example:<br />
+      <h4 id="oracle">Oracle</h4>
+      <pre class="hljs"><code><div>⤷ [answer] (roll if relevant)
+      </div></code></pre>
+      <p>Example:<br>
       <code>⤷ Yes, but… (d6=4)</code></p>
-
-      <hr />
-
-      <h2 id="4-consequences">4. Consequences</h2>
+      <p><strong>Shorthand convention</strong>:</p>
+      <ul>
+      <li>Use <code>&gt;</code> or <code>&lt;</code> for comparisons (e.g., <code>🎲2&lt;4</code> = fail, <code>🎲5&gt;3</code> = success).</li>
+      <li>Add <code>S</code> or <code>F</code> if needed: <code>🎲2&lt;4 F</code>.</li>
+      </ul>
+      <h3 id="44-consequences">4.4 Consequences</h3>
       <p>Record the narrative result after rolls:</p>
-      <pre><code>⇒ The door creaks open, but the noise echoes through the hall.</code></pre>
-
-      <hr />
-
-      <h2 id="5-persistent-elements">5. Persistent Elements</h2>
+      <pre class="hljs"><code><div>⇒ The door creaks open, but the noise echoes through the hall.
+      </div></code></pre>
+      <h3 id="45-persistent-elements">4.5 Persistent Elements</h3>
       <p>Track ongoing elements with tags.</p>
       <ul>
-        <li><strong>NPCs</strong>: <code>[N:Jonah|friendly|injured]</code> → later <code>[N:Jonah|captured]</code></li>
-        <li><strong>Locations</strong>: <code>[L:Lighthouse|ruined|stormy]</code></li>
-        <li><strong>Events &amp; Clocks</strong>: <code>[E:CultistPlot 2/6]</code></li>
-        <li><strong>Threads</strong>: <code>[Thread: Find Jonah’s Sister | Open]</code> → <code>[Thread:…|Closed]</code></li>
-        <li><strong>Player Character</strong>: <code>[PC:Name|HP 6|Stress 2|Gear:Dagger]</code> → <code>[PC:HP-1]</code></li>
+      <li><strong>NPCs</strong>: <code>[N:Jonah|friendly|injured]</code> → later <code>[N:Jonah|captured]</code></li>
+      <li><strong>Locations</strong>: <code>[L:Lighthouse|ruined|stormy]</code></li>
+      <li><strong>Events &amp; Clocks</strong>: <code>[E:CultistPlot 2/6]</code></li>
+      <li><strong>Threads</strong>: <code>[Thread: Find Jonah’s Sister | Open]</code> → <code>[Thread:…|Closed]</code></li>
+      <li><strong>Player Character</strong>: <code>[PC:Name|HP 6|Stress 2|Gear:Dagger]</code> → <code>[PC:HP-1]</code></li>
       </ul>
-      <p>Re-use IDs in later scenes to connect the log:<br />
-        <code>[#N:Jonah]</code>, <code>[#L:Lighthouse]</code>, <code>[#E:CultistPlot]</code>.
-      </p>
-
-      <hr />
-
-      <h2 id="6-progress-tracking">6. Progress Tracking</h2>
+      <p>Re-use IDs in later scenes to connect the log:<br>
+      <code>[#N:Jonah]</code>, <code>[#L:Lighthouse]</code>, <code>[#E:CultistPlot]</code>.</p>
+      <h3 id="46-progress-tracking">4.6 Progress Tracking</h3>
       <p>Different forms of progress can be tracked consistently:</p>
       <ul>
-        <li><strong>Clocks</strong> (fill up): <code>[Clock:Ritual 5/12]</code></li>
-        <li><strong>Tracks</strong> (progress bars): <code>[Track:Escape 3/8]</code></li>
-        <li><strong>Timers</strong> (count down): <code>[Timer:Dawn 2]</code></li>
+      <li><strong>Clocks</strong> (fill up): <code>[Clock:Ritual 5/12]</code></li>
+      <li><strong>Tracks</strong> (progress bars): <code>[Track:Escape 3/8]</code></li>
+      <li><strong>Timers</strong> (count down): <code>[Timer:Dawn 2]</code></li>
       </ul>
-
-      <hr />
-
-      <h2 id="7-random-tables">7. Random Tables</h2>
+      <h3 id="47-random-tables">4.7 Random Tables</h3>
       <p>When inspiration tables or generators are used, note the roll:</p>
       <ul>
-        <li><strong>Simple table</strong>:<br />
-          <code>📖 d100=42 → "A broken sword"</code>
-        </li>
-        <li><strong>Complex generator</strong>:<br />
-          <code>📚 Mythic Event: d100=78 + 11 → NPC Action / Betray</code>
-        </li>
+      <li>
+      <p><strong>Simple table</strong>:<br>
+      <code>📖 d100=42 → &quot;A broken sword&quot;</code></p>
+      </li>
+      <li>
+      <p><strong>Complex generator</strong>:<br>
+      <code>📚 Mythic Event: d100=78 + 11 → NPC Action / Betray</code></p>
+      </li>
       </ul>
-
-      <hr />
-
-      <h2 id="8-narrative-excerpts-optional">8. Narrative Excerpts (Optional)</h2>
+      <h3 id="48-narrative-excerpts-optional">4.8 Narrative Excerpts (Optional)</h3>
       <p>You may add narrative or dialogue where it helps.</p>
       <ul>
-        <li><strong>Inline prose</strong>:<br />
-          <code>⇒ The room reeks of mildew.</code>
-        </li>
-        <li><strong>Dialogue</strong>:
-          <pre><code>N (Guard): "Who’s there?"
-PC (whisper): "Stay calm… just stay calm."</code></pre>
-        </li>
-        <li><strong>Long block</strong>:
-          <pre><code>---
-The diary reads:  
-"The tides no longer obey the moon."  
----</code></pre>
-        </li>
+      <li>
+      <p><strong>Inline prose</strong>:<br>
+      <code>⇒ The room reeks of mildew.</code></p>
+      </li>
+      <li>
+      <p><strong>Dialogue</strong>:</p>
+      <pre class="hljs"><code><div>N (Guard): &quot;Who’s there?&quot;
+      PC: &quot;Stay calm…&quot;
+      </div></code></pre>
+      </li>
+      <li>
+      <p><strong>Long block</strong>:</p>
+      <pre class="hljs"><code><div>---
+      The diary reads:  
+      &quot;The tides no longer obey the moon.&quot;  
+      ---
+      </div></code></pre>
+      </li>
       </ul>
       <p>This is optional — shorthand alone is enough.</p>
-
-      <hr />
-
-      <h2 id="9-boundaries">9. Boundaries</h2>
-      <ul>
-        <li><strong>Session end:</strong><br />
-          <code>=== Session 1 End ===</code>
-        </li>
-        <li><strong>Campaign label:</strong><br />
-          <code>=== Campaign Log: Clearview Mystery ===</code>
-        </li>
-      </ul>
-
-      <hr />
-
-      <h2 id="10-meta-notes">10. Meta Notes</h2>
+      <h3 id="49-meta-notes">4.9 Meta Notes</h3>
       <p>Use parentheses for reminders, reflections, or house rules.</p>
-      <pre><code>(note: testing alternate stealth rule)</code></pre>
-
-      <hr />
-
-      <h2 id="11-examples">11. Examples</h2>
-
-      <h3 id="example-1-hybrid-log">Example 1 — Hybrid Log</h3>
-      <pre><code>[S7] *Dark alley behind tavern ⏰ Midnight*
-▶ Sneak past the guards
-🎲 Stealth d6=2 vs TN 4 → Fail
-⇒ My foot kicks a barrel. [E:AlertClock 2/6]
-
-? Do they see me?
-⤷ No, but… (d6=3)
-⇒ Distracted, but one guard lingers. [N:Guard|watchful]
-
-N (Guard): "Who's there?"
-PC (whisper): "Stay calm… just stay calm."</code></pre>
-
-      <h3 id="example-2-pure-shorthand">Example 2 — Pure Shorthand</h3>
-      <pre><code>S7 ▶Sneak 🎲2&lt;4 F → noise [E:Alert 2/6] ?Seen? ⤷Nb3 → distracted, 1 stays</code></pre>
-
-      <h3 id="example-3-tracking-threads">Example 3 — Tracking Threads</h3>
-      <pre><code>[S12] *Inside the lighthouse*
-▶ Search the chamber
-🎲 Investigation d6=5 vs TN 4 → Success
-⇒ I find a hidden diary. [E:CultistPlot 3/6] [Thread: Find Jonah’s Sister|Open]
-
-📖 Random clue: d100=42 → "A broken sword"</code></pre>
-
-      <hr />
-
-      <h2 id="12-micro-reference-appendix">12. Micro-Reference Appendix</h2>
+      <pre class="hljs"><code><div>(note: testing alternate stealth rule)
+      </div></code></pre>
+      <h2 id="5-examples">5. Examples</h2>
+      <h3 id="example-1--hybrid-log">Example 1 — Hybrid Log</h3>
+      <pre class="hljs"><code><div>[S7] *Dark alley behind tavern ⏰ Midnight*
+      ▶ Sneak past the guards
+      🎲 Stealth d6=2 vs TN 4 → Fail
+      ⇒ My foot kicks a barrel. [E:AlertClock 2/6]
+      
+      ? Do they see me?
+      ⤷ No, but… (d6=3)
+      ⇒ Distracted, but one guard lingers. [N:Guard|watchful]
+      
+      N (Guard): &quot;Who's there?&quot;
+      PC: &quot;Stay calm… just stay calm.&quot;
+      </div></code></pre>
+      <h3 id="example-2--pure-shorthand">Example 2 — Pure Shorthand</h3>
+      <pre class="hljs"><code><div>S7 ▶Sneak 🎲2&lt;4 F → noise [E:Alert 2/6] ?Seen? ⤷Nb3 → distracted, 1 stays
+      </div></code></pre>
+      <h3 id="example-3--tracking-threads">Example 3 — Tracking Threads</h3>
+      <pre class="hljs"><code><div>[S12] *Inside the lighthouse*
+      ▶ Search the chamber
+      🎲 Investigation d6=5 vs TN 4 → Success
+      ⇒ I find a hidden diary. [E:CultistPlot 3/6] [Thread: Find Jonah’s Sister|Open]
+      
+      📖 Random clue: d100=42 → &quot;A broken sword&quot;
+      </div></code></pre>
+      <h3 id="example-4--complete-campaign-log">Example 4 — Complete Campaign Log</h3>
+      <pre class="hljs"><code><div>=== Campaign Log: Clearview Mystery ===
+      [Title]        Clearview Mystery
+      [Ruleset]      Loner + Mythic Oracle
+      [Genre]        Teen mystery / supernatural
+      [Player]       Roberto
+      [PCs]          Alex (PC:Alex|HP 8|Stress 0|Gear: Flashlight, Notebook)
+      [Start Date]   2025-09-03
+      [Last Update]  2025-09-10
+      [Tools]        Oracles: Mythic, Random Event tables
+      [Themes]       Friendship, courage, secrets
+      [Tone]         Eerie but playful
+      [Notes]        Inspired by 80s teen mystery shows
+      
+      === Session 1 ===
+      [Date]        2025-09-03
+      [Duration]    1h30
+      [Start Scene] S1
+      [Goals]       Introduce Alex, set first clue
+      
+      [S1] *School library after hours*
+      ▶ Sneak inside to check the archives
+      🎲 Stealth d6=5 vs TN 4 → Success
+      ⇒ I slip inside unnoticed. [L:Library|dark|quiet]
+      
+      ? Is there a strange clue waiting?  
+      ⤷ Yes (d6=6)  
+      ⇒ I find a torn diary page about the lighthouse. [E:LighthouseClue 1/6]
+      
+      [S2] *Outside the library, empty hall*
+      ? Do I hear footsteps?  
+      ⤷ Yes, but… (d6=4)  
+      ⇒ A janitor approaches, but he doesn’t notice me yet. [N:Janitor|tired|suspicious]
+      
+      N (Janitor): &quot;Thought I heard something…&quot;  
+      PC (Alex, whisper): &quot;Gotta get out of here.&quot;
+      
+      === Session 1 End ===
+      
+      === Session 2 ===
+      [Date]        2025-09-10
+      [Duration]    2h
+      [Start Scene] S3
+      [Recap]       Found diary page hinting at lighthouse. Nearly spotted in library.
+      [Goals]       Investigate lighthouse, avoid suspicion.
+      
+      [S3] *Path to the old lighthouse ⏳ Day 2*
+      ▶ Approach quietly at dusk
+      🎲 Stealth d6=2 vs TN 4 → Fail
+      ⇒ I step on broken glass, crunching loudly. [Clock:Suspicion 1/6]
+      
+      ? Does anyone respond from inside?  
+      ⤷ No, but… (d6=3)  
+      ⇒ The light flickers briefly in the tower window. [L:Lighthouse|ruined|haunted]
+      
+      [S4] *Inside lighthouse foyer*
+      ▶ Search the floor for signs of activity
+      🎲 Investigation d6=6 vs TN 4 → Success
+      ⇒ I find fresh footprints in the dust. [Thread: Who is using the lighthouse?|Open]
+      
+      📖 Random table roll d100=42 → &quot;A broken lantern&quot;
+      ⇒ A cracked lantern lies near the stairs. [E:LighthouseClue 2/6]
+      
+      PC (Alex, thinking): &quot;Someone’s been here… recently.&quot;
+      
+      === Session 2 End ===
+      </div></code></pre>
+      <h2 id="6-micro-reference-appendix">6. Micro-Reference Appendix</h2>
       <p>A quick at-a-glance summary of common shorthand:</p>
-      <pre><code>S1 ▶Pick lock 🎲d20=17&gt;15 → Success ⇒ creak noise
-S2 ?Is anyone inside? ⤷Yes, but… ⇒ distracted guard
-S3 ▶Fight guard 🎲d6=1&lt;4 → Fail ⇒ HP-2 [PC:HP 8]
-S4 ?Does ally arrive? ⤷No, and… ⇒ Thread "Rescue" Open
-S5 ▶Search room 🎲d6=6&gt;4 → Success ⇒ find clue [#clue]
-S6 📖 d100=42 → "A broken sword" [E:CultPlot 3/6]
-S7 ▶Convince Jonah 🎲d20=12 vs DC 14 → Fail ⇒ Jonah angry [N:Jonah|hostile]
-S8 ?Does time run out? ⤷Yes ⇒ [Timer:Dawn 0]
-S9 ▶Escape tunnels 🎲d6=5&gt;3 → Success ⇒ [Track:Escape 6/8]
-S10 === Session 1 End ===</code></pre>
-
-      <hr />
-
-      <h2 id="conclusion">Conclusion</h2>
-      <p>This notation balances <strong>clarity</strong>, <strong>brevity</strong>, and <strong>expandability</strong>.</p>
+      <pre class="hljs"><code><div>S1 ▶Pick lock 🎲d20=17&gt;15 → Success ⇒ creak noise
+      S2 ?Is anyone inside? ⤷Yes, but… ⇒ distracted guard
+      S3 ▶Fight guard 🎲d6=1&lt;4 F ⇒ HP-2 [PC:HP 8]
+      S4 ?Does ally arrive? ⤷No, and… ⇒ Thread &quot;Rescue&quot; Open
+      S5 ▶Search room 🎲d6=6&gt;4 S ⇒ find clue [#clue]
+      S6 📖 d100=42 → &quot;A broken sword&quot; [E:CultPlot 3/6]
+      S7 ▶Convince Jonah 🎲d20=12&lt;14 F ⇒ Jonah angry [N:Jonah|hostile]
+      S8 ?Does time run out? ⤷Yes ⇒ [Timer:Dawn 0]
+      S9 ▶Escape tunnels 🎲d6=5&gt;3 S ⇒ [Track:Escape 6/8]
+      S10 === Session 1 End ===
+      </div></code></pre>
+      <h2 id="7-solo-rpg-notation-legend">7. Solo RPG Notation Legend</h2>
+      <p>A quick reference to the standard solo play notation.</p>
+      <h3 id="core-symbols">Core Symbols</h3>
       <ul>
-        <li>Use the shorthand alone for speed.</li>
-        <li>Add narrative and tags for depth.</li>
-        <li>Reuse IDs and codes to track story arcs over time.</li>
+      <li><code>[S#]</code> — Scene number and frame</li>
+      <li>▶ — Player action (mechanics)</li>
+      <li>? — Oracle question (world / uncertainty)</li>
+      <li>🎲 — Mechanics roll/result</li>
+      <li>⤷ — Oracle result</li>
+      <li>⇒ — Consequence / outcome</li>
       </ul>
-      <p>The result is a consistent, portable log format — a <strong>play language</strong> for solo RPGs.</p>
+      <h3 id="tracking">Tracking</h3>
+      <ul>
+      <li><code>[N:Name|tags]</code> — NPC</li>
+      <li><code>[L:Name|tags]</code> — Location</li>
+      <li><code>[E:Name X/Y]</code> — Event / Clock</li>
+      <li><code>[Thread:Name|Open/Closed]</code> — Story thread</li>
+      <li><code>[PC:Name|stats|gear]</code> — Player character</li>
+      </ul>
+      <h3 id="progress">Progress</h3>
+      <ul>
+      <li><code>[Clock:Name X/Y]</code> — Clock (fill up)</li>
+      <li><code>[Track:Name X/Y]</code> — Progress track (advance)</li>
+      <li><code>[Timer:Name X]</code> — Countdown</li>
+      </ul>
+      <h3 id="narrative-optional">Narrative (Optional)</h3>
+      <ul>
+      <li>Inline: <code>⇒ Short prose</code></li>
+      <li>Dialogue:<pre class="hljs"><code><div>N (Guard): &quot;Who's there?&quot;
+      PC: &quot;Stay calm…&quot;
+      </div></code></pre>
+      </li>
+      <li>Block:<pre class="hljs"><code><div>---
+      Text excerpt here
+      ---
+      </div></code></pre>
+      </li>
+      </ul>
+      <h3 id="meta">Meta</h3>
+      <ul>
+      <li><code>(note: … )</code> — Reflection, reminder, house rule</li>
+      </ul>
+      <h3 id="example-line">Example Line</h3>
+      <pre class="hljs"><code><div>S3 ▶Pick lock 🎲d20=17&gt;15 → Success ⇒ creak noise [N:Guard|alert]
+      </div></code></pre>
+      <h2 id="8-credits--license">8. Credits &amp; License</h2>
+      <p>This notation is inspired by the <a href="https://alfredvalley.itch.io/the-valley-standard">Valley Standard</a>.</p>
+      <p>This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.<br>
+      To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/<br>
+      or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.</p>
+      
     </article>
 
     <footer aria-label="footer">
