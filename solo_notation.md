@@ -1,11 +1,12 @@
-# Solo RPG Notation SRD  
-*A Standard for Recording Solo Play*
+# Solo TTRPG Notation
+
+*A Standard for Recording Solo TTRPG Play*
 
 **Version 2.0**
 
 ## 1. Introduction
 
-If you've ever played a solo RPG, you know the challenge: you're deep in an exciting scene, dice are rolling, oracles are answering questions, and suddenly you realize: "how do I capture all this without breaking the flow?"
+If you've ever played a solo RPG, you know the challenge: you're deep in an exciting scene, dice are rolling, oracles are answering questions, and suddenly you realize: how do I capture all this without breaking the flow?
 
 Maybe you've tried free-form journaling (gets messy), pure prose (loses the mechanics), or bullet points (hard to parse later). This notation system offers a different approach: a **lightweight shorthand** that captures the essential game elements while leaving room for as much (or as little) narrative as you want.
 
@@ -23,25 +24,25 @@ The notation is designed to be:
 - **Searchable** — tags and codes make it easy to track NPCs, events, and locations
 - **Format-agnostic** — works in digital markdown files or analog notebooks
 
-### Goals
+The notation's goals:
 
-- Make reports written by different people readable at a glance: standard symbols facilitate reading
-- Separate mechanics from fiction: the best reports are those that highlight how the use of rules and oracles informs fiction
-- Have a modular and scalable system: you can use the core symbols or extend the notation as you wish
-- Useful for both digital and analog notes
-- Compliance and extension of markdown for digital use
+- **Make reports written by different people readable at a glance:** standard symbols facilitate reading
+- **Separate mechanics from fiction:** the best reports are those that highlight how the use of rules and oracles informs fiction
+- **Have a modular and scalable system:** you can use the core symbols or extend the notation as you wish
+- **Make it useful for both digital and analog notes**
+- **Compliance and extension of markdown for digital use**
 
 ### 1.1 How to Use This Notation
 
 Think of this as a **toolbox, not a rulebook**. The system is fully modular: grab what works for you and leave the rest behind.
 
-At its core are just **five symbols** (see Section 3: Core Notation). These are the minimal language of play:
+At its core are just **five symbols** (see *Section 3: Core Notation*). These are the minimal language of play:
 
-- `>` for player actions  
-- `?` for oracle questions  
-- `d:` for mechanics rolls  
-- `->` for oracle results  
-- `=>` for consequences  
+- `>` for player actions
+- `?` for oracle questions
+- `d:` for mechanics rolls
+- `->` for oracle results
+- `=>` for consequences
 
 That's it. **Everything else is optional.**
 
@@ -49,8 +50,8 @@ Scenes, campaign headers, session headers, threads, clocks, narrative excerpts�
 
 Think of it as concentric circles:
 
-- **Core Notation** (required): Actions, Resolutions, Consequences  
-- **Optional Layers** (add as needed): Persistent Elements, Progress tracking, Notes, etc.  
+- **Core Notation** (required): Actions, Resolutions, Consequences
+- **Optional Layers** (add as needed): Persistent Elements, Progress tracking, Notes, etc.
 - **Optional Structure** (for organization): Campaign Header, Session Header, Scenes
 
 **Start small.** Try the core notation for one scene. If it clicks, great—keep going. If you need more, layer in what helps. Your notes should serve your play, not the other way around.
@@ -113,8 +114,7 @@ In paper notebooks:
 
 #### Digital markdown:
 
-```markdown
-
+````markdown
 ## Session 1
 *Date: 2025-09-03 | Duration: 1h30*
 
@@ -125,8 +125,7 @@ In paper notebooks:
 d: Stealth d6=5 vs TN 4 => Success
 => I slip inside unnoticed. [L:Library|dark|quiet]
 ```
-
-```
+````
 
 #### Analog notebook:
 
@@ -414,54 +413,64 @@ The `#` tells you this element was defined earlier. Use it to:
 
 ### 4.2 Progress Tracking
 
-Different forms of progress tracked consistently:
+Some things in your campaign don't happen all at once—they build up over time. The ritual takes twelve steps to complete. The guards' suspicion grows with each noise you make. Your escape plan inches forward. The air supply counts down.
 
-#### 4.2.1 Clocks (fill up toward completion):
+Progress tracking gives you a visual way to see these accumulating forces. Three formats handle different types of progression:
+
+**Clocks** (fill up toward completion):
 
 ```
 [Clock:Ritual 5/12]
 [Clock:Suspicion 3/6]
 ```
 
-Use for: Accumulating danger, spell preparation, building tension
+**Use for:** Threats building, spells preparing, danger accumulating. When the clock fills, something happens (usually bad for you).
 
-#### 4.2.2 Tracks (progress toward a goal):
+**Tracks** (progress toward a goal):
 
 ```
 [Track:Escape 3/8]
 [Track:Investigation 6/10]
 ```
 
-Use for: Journey progress, research, long-term projects
+**Use for:** Your progress on projects, journey advancement, long-term goals. When the track fills, you succeed at something.
 
-#### 4.2.3 Timers (count down toward zero):
+**Timers** (count down toward zero):
 
 ```
 [Timer:Dawn 3]
 [Timer:AirSupply 5]
 ```
 
-Use for: Deadlines, resource depletion, time pressure
+**Use for:** Deadlines approaching, resources depleting, time pressure. When it hits zero, time's up.
+
+**The difference?** Clocks and tracks both go up, but clocks are threats (bad when full) and tracks are progress (good when full). Timers go down and create urgency.
+
+You don't need to track everything numerically. Only use these when the accumulation matters to your story and you want a concrete way to measure it.
 
 ### 4.3 Random Tables & Generators
 
-When using random tables or generators, record the roll:
+Solo play thrives on surprise. Sometimes you roll on a table to see what you find, or use a generator to create an NPC on the fly. When you do, it helps to record what you rolled—both for transparency and so you can recreate the logic later.
 
-#### 4.3.1 Simple table:
+**Simple table lookup:**
 
 ```
 tbl: d100=42 => "A broken sword"
 tbl: d20=15 => "The merchant is nervous"
 ```
 
-#### 4.3.2 Complex generator:
+Use `tbl:` when you're pulling from a straightforward random table—the kind where you roll once and get a result.
+
+**Complex generators:**
 
 ```
 gen: Mythic Event d100=78 + 11 => NPC Action / Betray
 gen: Stars Without Number NPC d8=3,d10=7 => Gruff/Pilot
 ```
 
-#### 4.3.3 Oracle with table:
+Use `gen:` when you're using a multi-step generator that combines multiple rolls or produces compound results.
+
+**Integrating with oracle questions:**
 
 ```
 ? What do I find in the chest?
@@ -469,17 +478,29 @@ tbl: d100=42 => "A broken sword"
 => An ancient blade, snapped in two, with strange runes on the hilt.
 ```
 
+**Why record the rolls?** Three reasons:
+
+1. **Transparency**: If you're sharing the log, others see your process
+2. **Reproducibility**: You can trace how you got surprising results  
+3. **Learning**: Over time, you see which tables you use most
+
+That said, if you're playing fast and loose, you can skip the roll details and just record the result: `=> I find a broken sword [tbl]`. The important part is the fiction, not the math.
+
 ### 4.4 Narrative Excerpts
 
-Add narrative or dialogue wherever it enhances your log.
+Here's a secret: **you don't need to write narrative at all**. The shorthand captures everything mechanically. But sometimes the fiction demands more—a piece of dialogue that's too perfect not to record, a description that sets the mood, a document your character finds.
 
-#### 4.4.1 Inline prose:
+That's what narrative excerpts are for: the moments where shorthand isn't enough.
+
+**Inline prose** (short descriptions):
 
 ```
 => The room reeks of mildew and decay. Papers are scattered everywhere.
 ```
 
-#### 4.4.2 Dialogue:
+Use for: Quick atmospheric details, sensory information, emotional beats. Keep it short—a sentence or two.
+
+**Dialogue** (conversations worth recording):
 
 ```
 N (Guard): "Who's there?"
@@ -488,27 +509,50 @@ N (Guard): "Show yourself!"
 PC: [whispers] "Not happening."
 ```
 
-#### 4.4.3 Long narrative block:
+Use for: Memorable exchanges, character voice, important conversations. You don't need to record every word—just the exchanges that matter.
+
+**Long narrative blocks** (found documents, important descriptions):
 
 ```
-The diary reads:
-"Day 47: The tides no longer obey the moon. The fish have stopped
-coming. The lighthouse keeper says he sees lights beneath the waves.
-I fear for our sanity."
+  ---
+  The diary reads:
+  "Day 47: The tides no longer obey the moon. The fish have stopped
+  coming. The lighthouse keeper says he sees lights beneath the waves.
+  I fear for our sanity."
+  ---
 ```
 
-**Narrative is entirely optional.** The shorthand alone is sufficient for recording play. Add prose only when it helps you remember or share the experience.
+Use for: In-world documents, lengthy descriptions, key revelations. The `---` markers separate it from your log, making it clear this is in-fiction content.
+
+**How much narrative should you write?** Only as much as serves you. If you're playing for yourself and shorthand tells you everything you need to remember, skip the prose. If you're sharing your log or you love the writing process, add more. There's no right amount—just what makes your log useful and enjoyable to you.
 
 ### 4.5 Meta Notes
 
-Use parentheses for out-of-character notes, reflections, or rule clarifications:
+Sometimes you need to step outside the fiction and leave yourself a note: a reminder about a house rule you're testing, a reflection on how a scene felt, a question to revisit later, or a clarification about your interpretation of a rule.
+
+That's what meta notes are for—your out-of-character asides to yourself (or to readers, if you're sharing).
+
+**Format:** Use parentheses to signal "this is meta, not fiction":
 
 ```
 (note: testing alternate stealth rule where noise increases Alert clock)
 (reflection: this scene felt tense! the timer really worked)
 (house rule: giving advantage on familiar terrain)
 (reminder: revisit this thread next session)
+(question: should I have rolled for that? seemed obvious)
 ```
+
+**When to use meta notes:**
+
+- **Experiments**: Track rule variants or house rules you're testing
+- **Reflection**: Capture what worked or didn't work emotionally
+- **Reminders**: Flag things to follow up on later
+- **Clarification**: Explain unusual rulings or interpretations
+- **Process**: Document your thinking for shared logs
+
+**When NOT to use them:** Don't let meta notes overwhelm your log. If you're stopping every few lines to reflect, you're probably over-thinking it. The game is the thing—meta notes are just occasional margin comments.
+
+Think of them like director's commentary on a movie. Most of the time, you just watch the film. Occasionally, there's an interesting behind-the-scenes note worth sharing.
 
 ## 5. Optional Structure
 
@@ -705,7 +749,7 @@ d: Investigation d6=6 vs TN 4 => Success
 
 S8a *Flashback: Home, 15 years ago*
 (Memory triggered by the photograph)
-> Do I remember anything about this place?
+(Do I remember anything about this place?)
 ? Did mother ever mention a lighthouse?
 -> Yes, but... (d6=5)
 => She mentioned it once, briefly, then changed the subject quickly.
@@ -715,7 +759,7 @@ N (Mother): [nervous] "Just an old place. Nothing important."
 
 S8b *Flashback: Mother's study, 14 years ago*
 (Following the thread of memory)
-> Did I ever see documents about the lighthouse?
+(Did I ever see documents about the lighthouse?)
 ? Was I snooping in her papers?
 -> Yes, and... (d6=6)
 => I found a deed. The lighthouse belonged to our family!
@@ -1009,27 +1053,27 @@ S3 >Dodge d:3≤5 F => HP-2 [PC:HP 6] => bleeding, need to retreat
 
 Combines shorthand with narrative, using markdown structure:
 
-```markdown
-  ### S7 *Dark alley behind tavern, Midnight*
+````markdown
+### S7 *Dark alley behind tavern, Midnight*
 
-  ```
-  > Sneak past the guards
-  d: Stealth d6=2 vs TN 4 => Fail
-  => My foot kicks a barrel. [E:AlertClock 2/6]
-
-  ? Do they see me?
-  -> No, but... (d6=3)
-  => Distracted, but one guard lingers. [N:Guard|watchful]
-  ```
-
-  The guard's torch light sweeps across the alley walls. I press myself
-  into the shadows, barely breathing.
-
-  ```
-  N (Guard): "Who's there?"
-  PC: "Stay calm... just stay calm."
-  ```
 ```
+> Sneak past the guards
+d: Stealth d6=2 vs TN 4 => Fail
+=> My foot kicks a barrel. [E:AlertClock 2/6]
+
+? Do they see me?
+-> No, but... (d6=3)
+=> Distracted, but one guard lingers. [N:Guard|watchful]
+```
+
+The guard's torch light sweeps across the alley walls. I press myself
+into the shadows, barely breathing.
+
+```
+N (Guard): "Who's there?"
+PC: "Stay calm... just stay calm."
+```
+````
 
 ### 6.3 Analog Notebook Format
 
@@ -1054,93 +1098,92 @@ PC: "Stay calm... just stay calm."
 
 ### 6.4 Complete Campaign Log (Digital)
 
-```markdown
-  ---
-  title: Clearview Mystery
-  ruleset: Loner + Mythic Oracle
-  genre: Teen mystery / supernatural
-  player: Roberto
-  pcs: Alex [PC:Alex|HP 8|Stress 0]
-  start_date: 2025-09-03
-  last_update: 2025-10-28
-  ---
+````markdown
+---
+title: Clearview Mystery
+ruleset: Loner + Mythic Oracle
+genre: Teen mystery / supernatural
+player: Roberto
+pcs: Alex [PC:Alex|HP 8|Stress 0]
+start_date: 2025-09-03
+last_update: 2025-10-28
+---
 
-  # Clearview Mystery
+# Clearview Mystery
 
-  ## Session 1
-  *Date: 2025-09-03 | Duration: 1h30*
+## Session 1
+*Date: 2025-09-03 | Duration: 1h30*
 
-  ### S1 *School library after hours*
+### S1 *School library after hours*
 
-  ```
-  > Sneak inside to check the archives
-  d: Stealth d6=5 vs TN 4 => Success
-  => I slip inside unnoticed. [L:Library|dark|quiet]
-
-  ? Is there a strange clue waiting?
-  -> Yes (d6=6)
-  => I find a torn diary page about the lighthouse. [E:LighthouseClue 1/6]
-  ```
-
-  The page is yellowed with age. The handwriting is shaky: "The light 
-  calls to us. We must not answer."
-
-  ```
-  [Thread:Lighthouse Mystery|Open]
-  ```
-
-  ### S2 *Outside the library, empty hall*
-
-  ```
-  ? Do I hear footsteps?
-  -> Yes, but... (d6=4)
-  => A janitor approaches, but he doesn't notice me yet. [N:Janitor|tired|suspicious]
-  ```
-
-  I freeze. His keys jangle as he walks past the doorway.
-
-  ```
-  N (Janitor): "Thought I heard something..."
-  PC (Alex, whisper): "Gotta get out of here."
-
-  > Slip out while he's distracted
-  d: Stealth d6=6 vs TN 4 => Success
-  => I escape into the night safely.
-  ```
-  ## Session 2
-  *Date: 2025-09-10 | Duration: 2h*
-
-  **Recap:** Found diary page hinting at lighthouse. Nearly spotted in library.
-
-  ### S3 *Path to the old lighthouse, Day 2*
-
-  ```
-  > Approach quietly at dusk
-  d: Stealth d6=2 vs TN 4 => Fail
-  => I step on broken glass, crunching loudly. [Clock:Suspicion 1/6]
-
-  ? Does anyone respond from inside?
-  -> No, but... (d6=3)
-  => The light flickers briefly in the tower window. [L:Lighthouse|ruined|haunted]
-  ```
-
-  ### S4 *Inside lighthouse foyer*
-
-  ```
-  > Search the floor for signs of activity
-  d: Investigation d6=6 vs TN 4 => Success
-  => I find fresh footprints in the dust. [Thread:Who is using the lighthouse?|Open]
-
-  tbl: d100=42 => "A broken lantern"
-  => A cracked lantern lies near the stairs. [E:LighthouseClue 2/6]
-  ```
-
-  Someone's been here. Recently.
-
-  ```
-  PC (Alex, thinking): "This place isn't as abandoned as everyone thinks..."
-  ```
 ```
+> Sneak inside to check the archives
+d: Stealth d6=5 vs TN 4 => Success
+=> I slip inside unnoticed. [L:Library|dark|quiet]
+
+? Is there a strange clue waiting?
+-> Yes (d6=6)
+=> I find a torn diary page about the lighthouse. [E:LighthouseClue 1/6]
+```
+
+The page is yellowed with age. The handwriting is shaky: "The light 
+calls to us. We must not answer."
+
+```
+[Thread:Lighthouse Mystery|Open]
+```
+
+### S2 *Outside the library, empty hall*
+
+```
+? Do I hear footsteps?
+-> Yes, but... (d6=4)
+=> A janitor approaches, but he doesn't notice me yet. [N:Janitor|tired|suspicious]
+```
+
+I freeze. His keys jangle as he walks past the doorway.
+
+N (Janitor): "Thought I heard something..."
+PC (Alex, whisper): "Gotta get out of here."
+
+```
+> Slip out while he's distracted
+d: Stealth d6=6 vs TN 4 => Success
+=> I escape into the night safely.
+```
+## Session 2
+*Date: 2025-09-10 | Duration: 2h*
+
+**Recap:** Found diary page hinting at lighthouse. Nearly spotted in library.
+
+### S3 *Path to the old lighthouse, Day 2*
+
+```
+> Approach quietly at dusk
+d: Stealth d6=2 vs TN 4 => Fail
+=> I step on broken glass, crunching loudly. [Clock:Suspicion 1/6]
+
+? Does anyone respond from inside?
+-> No, but... (d6=3)
+=> The light flickers briefly in the tower window. [L:Lighthouse|ruined|haunted]
+```
+
+### S4 *Inside lighthouse foyer*
+
+```
+> Search the floor for signs of activity
+d: Investigation d6=6 vs TN 4 => Success
+=> I find fresh footprints in the dust. [Thread:Who is using the lighthouse?|Open]
+
+tbl: d100=42 => "A broken lantern"
+=> A cracked lantern lies near the stairs. [E:LighthouseClue 2/6]
+```
+
+Someone's been here. Recently.
+
+PC (Alex, thinking): "This place isn't as abandoned as everyone thinks..."
+
+````
 
 ### 6.5 Complete Campaign Log (Analog)
 
@@ -1213,7 +1256,7 @@ PC (Alex): "This place isn't as abandoned as everyone thinks..."
 
 ```
 
-## 7. Best Practices & Anti-Patterns
+## 7. Best Practices
 
 You've learned the notation—now let's talk about using it well. This section shows proven patterns that make your logs clearer and more useful, plus common mistakes to avoid.
 
@@ -1239,6 +1282,7 @@ d: d20=15 vs DC 14 => Success
 ```
 
 **Do: Record consequences clearly**
+
 ```
 => I find the key. [E:Clue 2/4]
 => But the guard heard me. [Clock:Alert 1/6]
@@ -1259,7 +1303,7 @@ d: 5≥4 S => Success
 => I slip by unnoticed, heart pounding.
 ```
 
-### 7.2 Anti-Patterns to Avoid ✗
+### 7.2 Bad Practices ✗
 
 These are common pitfalls that make logs harder to read or parse. If you catch yourself doing these, don't worry—just adjust for next time. We've all been there!
 
@@ -1268,7 +1312,7 @@ These are common pitfalls that make logs harder to read or parse. If you catch y
 ```
 ❌ I tried to pick the lock and rolled a 15 which beat the DC so I opened it
 
-✓ > Pick the lock
+✔️ > Pick the lock
   d: 15≥14 => Success
   => The door opens quietly.
 ```
@@ -1279,7 +1323,7 @@ These are common pitfalls that make logs harder to read or parse. If you catch y
 ❌ > Attack the guard
   d: 8≤10 => Fail
 
-✓ > Attack the guard
+✔️ > Attack the guard
   d: 8≤10 => Fail
   => My blade glances off his armor. He counterattacks!
 ```
@@ -1290,7 +1334,7 @@ These are common pitfalls that make logs harder to read or parse. If you catch y
 ❌ [N:Guard|alert] ... then later ... [N:Guard|sleeping]
    (How did this change? When?)
 
-✓ [N:Guard|alert] ... then later ...
+✔️ [N:Guard|alert] ... then later ...
   > Knock him out
   d: 6≥5 S => [N:Guard|unconscious]
 ```
@@ -1300,7 +1344,7 @@ These are common pitfalls that make logs harder to read or parse. If you catch y
 ```
 ❌ ? Sneak past guards    (This is an action, not a question)
 
-✓ > Sneak past guards    (Actions use >)
+✔️ > Sneak past guards    (Actions use >)
   ? Do they notice?      (Questions use ?)
 ```
 
@@ -1310,19 +1354,23 @@ These are common pitfalls that make logs harder to read or parse. If you catch y
 ❌ S7
   > Sneak past guards
   
-✓ S7 *Dark alley, midnight*
+✔️ S7 *Dark alley, midnight*
   > Sneak past guards
 ```
 
-## 8. Solo RPG Notation Legend
+## 8. Templates
 
-This is your quick reference—the cheat sheet to keep handy while you play. Forget what `=>` means? Need to remember how to format a clock? This section has you covered.
+Starting from a blank page can be daunting. These templates give you a structured starting point—copy them, fill in the blanks, and start playing.
 
-Think of it as the notation's "vocabulary list." Everything here has been explained earlier in detail; this is just the condensed version for fast lookup.
+Each template comes in both **digital markdown** and **analog notebook** formats. Choose whichever matches your play style, or use them as inspiration to create your own.
 
-Bookmark this section. You'll come back to it often in your first few sessions, then less and less as the notation becomes second nature.
+Don't treat these as rigid forms. They're scaffolding. Once you're comfortable with the notation, you'll probably develop your own templates that fit your specific needs better.
 
 ### 8.1 Campaign Template (Digital YAML)
+
+For digital markdown files, use YAML front matter to store campaign metadata. This goes at the very top of your file, before any other content.
+
+Copy this template, fill in your details, and you're ready to start your first session.
 
 ```yaml
 title: 
@@ -1352,6 +1400,8 @@ Your play log here...
 
 ### 8.2 Campaign Template (Analog)
 
+For paper notebooks, write this header block at the start of your campaign log. Keep it simple—you can always add more details later if needed.
+
 ```
 === Campaign Log: [Title] ===
 [Title]        
@@ -1377,20 +1427,24 @@ Your play log here...
 
 ### 8.3 Session Template
 
-#### Digital:
+Use this at the start of each play session to mark boundaries and provide context. The digital version uses markdown headings; the analog version uses written headers.
 
-```markdown
-  ## Session X
-  *Date: | Duration: | Scenes: *
+Fill in what's useful and skip what's not. The only essential field is the date—everything else is optional.
 
-  **Recap:** 
+**Digital:**
 
-  **Goals:** 
+````markdown
+## Session X
+*Date: | Duration: | Scenes: *
 
-  ### S1 *Scene description*
-```
+**Recap:** 
 
-#### Analog:
+**Goals:** 
+
+### S1 *Scene description*
+````
+
+**Analog:**
 
 ```
 === Session X ===
@@ -1404,28 +1458,36 @@ S1 *Scene description*
 
 ### 8.4 Quick Scene Template
 
-```
-  S# *Location, time*
-  ```
-  > Your action
-  d: your roll => outcome
-  => What happens
+This is your workhorse template—the basic structure you'll use scene after scene. It's intentionally minimal: just enough structure to keep you oriented without slowing you down.
 
-  ? Your question
-  -> Oracle answer
-  => What it means
-  ```
+Use this as your default starting point for every scene, whether you're playing digitally or analog.
+
+````markdown
+S# *Location, time*
 ```
+> Your action
+d: your roll => outcome
+=> What happens
+
+? Your question
+-> Oracle answer
+=> What it means
+```
+````
 
 ## 9. Adapting to Your System
 
 Here's the beautiful part: this notation works with *any* solo RPG system. *Ironsworn*, *Mythic GME*, *Thousand Year Old Vampire*, your own homebrew—doesn't matter. The core symbols stay the same; only the resolution details change.
 
-This section shows you how to adapt the `d:` roll notation and `->` oracle formats to match your specific game system. We'll cover common systems (PbtA, FitD, Ironsworm, OSR) and oracles (Mythic, CRGE, MUNE), but the principles work for anything.
+This section shows you how to adapt the `d:` roll notation and `->` oracle formats to match your specific game system. We'll cover common systems (PbtA, FitD, Ironsworn, OSR) and oracles (Mythic, CRGE, MUNE), but the principles work for anything.
 
 **The key insight:** The notation separates *mechanics* from *fiction*. Your system determines how mechanics work; the notation just records them consistently.
 
 ### 9.1 System-Specific Roll Notation
+
+The `d:` notation works with any system—you just need to adapt it to your specific dice mechanics. Here's how the notation looks across popular solo RPG systems.
+
+These examples show the pattern: record what you rolled, compare it to what you needed, note the outcome. The details change by system, but the structure stays the same.
 
 #### 9.1.1 Powered by the Apocalypse (PbtA):
 
@@ -1450,14 +1512,14 @@ d: Action=7+Stat=2=9 vs Challenge=4,8 => Weak Hit
 d: Action=10+Stat=3=13 vs Challenge=2,7 => Strong Hit
 ```
 
-#### 9.1.3 Fate/Fudge:
+#### 9.1.4 Fate/Fudge:
 
 ```
 d: 4dF=+2 (++0-) +Skill=3 = +5 => Success with Style
 d: 4dF=-1 (-0--) +Skill=2 = +1 => Tie
 ```
 
-#### 9.1.24 OSR/Traditional D&D:
+#### 9.1.5 OSR/Traditional D&D:
 
 ```
 d: d20=15+Mod=2=17 vs AC 16 => Hit
@@ -1465,6 +1527,10 @@ d: d20=8+Mod=-1=7 vs DC 10 => Fail
 ```
 
 ### 9.2 Oracle Adaptations
+
+Different oracle systems have different output formats. Some give yes/no answers, others generate complex results. Here's how to record results from popular oracle systems.
+
+The key is consistency: always use `->` for oracle results, then capture whatever information your oracle provides.
 
 #### 9.2.1 Mythic GME:
 
@@ -1575,11 +1641,15 @@ What if the oracle doesn't help?
 
 ## Appendices
 
-## A. Solo RPG Notation Legend
+### A. Solo RPG Notation Legend
 
-Quick reference to all notation elements.
+This is your quick reference—the cheat sheet to keep handy while you play. Forget what `=>` means? Need to remember how to format a clock? This section has you covered.
 
-### A.1 Core Symbols
+Think of it as the notation's "vocabulary list." Everything here has been explained earlier in detail; this is just the condensed version for fast lookup.
+
+Bookmark this section. You'll come back to it often in your first few sessions, then less and less as the notation becomes second nature.
+
+#### A.1 Core Symbols
 
 - `>` — Player action (mechanics)
 - `?` — Oracle question (world/uncertainty)
@@ -1587,7 +1657,7 @@ Quick reference to all notation elements.
 - `->` — Oracle result
 - `=>` — Consequence/outcome
 
-### A.2 Comparison Operators
+#### A.2 Comparison Operators
 
 - `≥` — Greater than or equal (meets/beats TN)
 - `≤` — Less than or equal (fails to meet TN)
@@ -1595,7 +1665,7 @@ Quick reference to all notation elements.
 - `S` — Success flag
 - `F` — Fail flag
 
-### A.3 Tracking Tags
+#### A.3 Tracking Tags
 
 - `[N:Name|tags]` — NPC (first mention)
 - `[#N:Name]` — NPC (reference to earlier mention)
@@ -1604,33 +1674,33 @@ Quick reference to all notation elements.
 - `[Thread:Name|state]` — Story thread
 - `[PC:Name|stats]` — Player character
 
-### A.4 Progress Tracking
+#### A.4 Progress Tracking
 
 - `[Clock:Name X/Y]` — Clock (fills up)
 - `[Track:Name X/Y]` — Progress track
 - `[Timer:Name X]` — Countdown timer
 
-### A.5 Random Generation
+#### A.5 Random Generation
 
 - `tbl: roll => result` — Simple table lookup
 - `gen: system => result` — Complex generator
 
-### A.6 Structure
+#### A.6 Structure
 
 - `S#` or `S#a` — Scene number
 - `T#-S#` — Thread-specific scene
 
-### A.7 Narrative (Optional)
+#### A.7 Narrative (Optional)
 
 - Inline: `=> Prose here`
 - Dialogue: `N (Name): "Speech"`
 - Block: `--- text ---`
 
-### A.8 Meta
+#### A.8 Meta
 
 - `(note: ...)` — Reflection, reminder, house rule
 
-### A.9 Complete Example Line
+#### A.9 Complete Example Line
 
 ```
 S3 >Pick lock d:15≥14 S => door opens quietly [N:Guard|alert]
@@ -1638,6 +1708,10 @@ S3 >Pick lock d:15≥14 S => door opens quietly [N:Guard|alert]
 
 
 ## B. FAQ
+
+Got questions? You're not alone. These are the most common questions from people learning the notation, along with straight answers.
+
+If your question isn't here, remember: the notation is flexible. If you're wondering whether you can do something differently, the answer is probably "yes, if it works for you."
 
 **Q: Do I need to use every element?**  
 A: No! Start with just `>`, `?`, `d:`, `->`, and `=>`. Add other elements only if they help you.
@@ -1672,7 +1746,8 @@ A: Show significant changes explicitly: `[N:Guard|alert]` → `[N:Guard|unconsci
 
 This notation is inspired by the [Valley Standard](https://alfredvalley.itch.io/the-valley-standard).
 
-**Version History:**  
+**Version History:**
+
 - v2.0 (2025-10-28) — Modular system, optional layers, markdown compliance, format separation, expanded examples
 - v1.0 (2024-09-03) — Initial release
 
@@ -1681,11 +1756,13 @@ This work is licensed under the **Creative Commons Attribution-ShareAlike 4.0 In
 To view a copy of this license, visit: http://creativecommons.org/licenses/by-sa/4.0/  
 Or write to: Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
-**You are free to:**  
+**You are free to:**
+
 - Share — copy and redistribute the material
 - Adapt — remix, transform, and build upon the material
 
-**Under these terms:**  
+**Under these terms:**
+
 - Attribution — Give appropriate credit
 - ShareAlike — Distribute adaptations under the same license
 
