@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-solo-rpg-notation",
+  "name": "obsidian-solo-ttrpg-notation",
   "version": "1.0.0",
-  "description": "Obsidian plugin for Solo TTRPG Notation system - templates, indexing, and visualization",
+  "description": "Plugin for Solo TTRPG Notation system - templates, indexing, and visualization",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
