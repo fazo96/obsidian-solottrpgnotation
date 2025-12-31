@@ -234,6 +234,9 @@ export interface CampaignStats {
 	totalNPCs: number;
 	totalLocations: number;
 	totalProgressElements: number;
+	totalTableLookups: number;
+	totalGenerators: number;
+	totalMetaNotes: number;
 	lastUpdated?: string;
 }
 

@@ -320,6 +320,25 @@ export class NotationIndexer {
 			campaign.timers.size +
 			campaign.events.size;
 
+		// Count new notation element types
+		let totalTableLookups = 0;
+		let totalGenerators = 0;
+		let totalMetaNotes = 0;
+
+		for (const session of campaign.sessions) {
+			for (const scene of session.scenes) {
+				for (const element of scene.elements) {
+					if (element.type === 'table_lookup') {
+						totalTableLookups++;
+					} else if (element.type === 'generator') {
+						totalGenerators++;
+					} else if (element.type === 'meta_note') {
+						totalMetaNotes++;
+					}
+				}
+			}
+		}
+
 		return {
 			totalSessions: campaign.sessions.length,
 			totalScenes,
@@ -328,6 +347,9 @@ export class NotationIndexer {
 			totalNPCs: campaign.npcs.size,
 			totalLocations: campaign.locations.size,
 			totalProgressElements,
+			totalTableLookups,
+			totalGenerators,
+			totalMetaNotes,
 			lastUpdated: campaign.frontMatter.last_update,
 		};
 	}

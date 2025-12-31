@@ -130,6 +130,17 @@ export class DashboardView extends ItemView {
 					`${stats.totalProgressElements} trackers`
 				);
 			}
+
+			// Show new notation elements if present
+			if (stats.totalTableLookups > 0) {
+				this.createStat(statsContainer, '🎲', `${stats.totalTableLookups} tables`);
+			}
+			if (stats.totalGenerators > 0) {
+				this.createStat(statsContainer, '⚙️', `${stats.totalGenerators} generators`);
+			}
+			if (stats.totalMetaNotes > 0) {
+				this.createStat(statsContainer, '📝', `${stats.totalMetaNotes} notes`);
+			}
 		}
 
 		// Metadata

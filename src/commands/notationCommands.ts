@@ -217,6 +217,104 @@ export function registerNotationCommands(
 		}
 	});
 
+	// Insert Table Lookup (tbl:)
+	plugin.addCommand({
+		id: 'insert-table-lookup',
+		name: 'Insert Table Lookup (tbl:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('tbl: d100= => result', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 10
+			});
+		}
+	});
+
+	// Insert Generator (gen:)
+	plugin.addCommand({
+		id: 'insert-generator',
+		name: 'Insert Generator (gen:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('gen: System => result', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 5
+			});
+		}
+	});
+
+	// Insert Meta Note
+	plugin.addCommand({
+		id: 'insert-meta-note',
+		name: 'Insert Meta Note (note:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('(note: )', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 7
+			});
+		}
+	});
+
+	// Insert Reflection
+	plugin.addCommand({
+		id: 'insert-reflection',
+		name: 'Insert Reflection (reflection:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('(reflection: )', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 13
+			});
+		}
+	});
+
+	// Insert House Rule
+	plugin.addCommand({
+		id: 'insert-house-rule',
+		name: 'Insert House Rule (house rule:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('(house rule: )', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 13
+			});
+		}
+	});
+
+	// Insert Reminder
+	plugin.addCommand({
+		id: 'insert-reminder',
+		name: 'Insert Reminder (reminder:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('(reminder: )', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 11
+			});
+		}
+	});
+
+	// Insert Question
+	plugin.addCommand({
+		id: 'insert-question',
+		name: 'Insert Question (question:)',
+		editorCallback: (editor: Editor) => {
+			const cursor = editor.getCursor();
+			editor.replaceRange('(question: )', cursor);
+			editor.setCursor({
+				line: cursor.line,
+				ch: cursor.ch + 11
+			});
+		}
+	});
+
 	// List all snippets
 	plugin.addCommand({
 		id: 'list-snippets',
