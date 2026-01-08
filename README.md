@@ -329,7 +329,7 @@ Open **Settings → Solo TTRPG Notation** to configure:
 ## Support
 
 - **Issues & Bugs**: [GitHub Issues](https://github.com/roberto-b/solorpgnotation/issues)
-- **Notation Spec**: See `solo_notation.md` for complete specification
+- **Notation Spec**: See [Solo TTRPG Notation](https://zeruhur.itch.io/solo-ttrpg-notation)
 - **Examples**: Check the `examples/` folder for sample campaigns
 
 ## Credits
