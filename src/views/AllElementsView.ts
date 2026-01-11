@@ -23,10 +23,12 @@ type SortDirection = 'asc' | 'desc';
 export class AllElementsView extends ItemView {
 	indexer: NotationIndexer;
 	private searchQuery: string = '';
-	private typeFilter: Set<string> = new Set(['NPC', 'Location', 'Thread', 'Clock', 'Track', 'Timer', 'Event', 'PC']);
+	private selectedType: string = 'All';
 	private campaignFilter: string = 'all';
 	private sortColumn: SortColumn = 'name';
 	private sortDirection: SortDirection = 'asc';
+	private searchInput: HTMLInputElement | null = null;
+	private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	constructor(leaf: WorkspaceLeaf, indexer: NotationIndexer) {
 		super(leaf);
@@ -58,6 +60,8 @@ export class AllElementsView extends ItemView {
 	 */
 	async render() {
 		const container = this.containerEl.children[1] as HTMLElement;
+		const wasSearchFocused = this.searchInput === document.activeElement;
+
 		container.empty();
 		container.addClass('solo-rpg-container');
 
@@ -87,6 +91,11 @@ export class AllElementsView extends ItemView {
 			const allElements = this.getAllElements();
 			footer.createEl('p', { text: `Showing ${elements.length} of ${allElements.length} elements` });
 		}
+
+		// Restore focus to search input if it was focused
+		if (wasSearchFocused && this.searchInput) {
+			this.searchInput.focus();
+		}
 	}
 
 	/**
@@ -102,9 +111,17 @@ export class AllElementsView extends ItemView {
 			placeholder: 'Search elements...',
 			value: this.searchQuery,
 		});
+		this.searchInput = searchInput;
 		searchInput.addEventListener('input', (e) => {
 			this.searchQuery = (e.target as HTMLInputElement).value;
-			this.render();
+
+			if (this.debounceTimer) {
+				clearTimeout(this.debounceTimer);
+			}
+
+			this.debounceTimer = setTimeout(() => {
+				this.render();
+			}, 300);
 		});
 
 		// Type filters
@@ -114,10 +131,10 @@ export class AllElementsView extends ItemView {
 		typeLabel.style.display = 'block';
 
 		const typeFilters = panel.createDiv({ cls: 'solo-rpg-type-filters' });
-		const types = ['NPC', 'Location', 'Thread', 'Clock', 'Track', 'Timer', 'Event', 'PC'];
+		const types = ['All', 'NPC', 'Location', 'Thread', 'Clock', 'Track', 'Timer', 'Event', 'PC'];
 		for (const type of types) {
 			const chip = typeFilters.createDiv({
-				cls: `solo-rpg-type-chip ${this.typeFilter.has(type) ? 'active' : ''}`,
+				cls: `solo-rpg-type-chip ${this.selectedType === type ? 'active' : ''}`,
 				text: type,
 			});
 			chip.addEventListener('click', () => {
@@ -306,7 +323,9 @@ export class AllElementsView extends ItemView {
 		let elements = this.getAllElements();
 
 		// Apply type filter
-		elements = elements.filter(e => this.typeFilter.has(e.type));
+		if (this.selectedType !== 'All') {
+			elements = elements.filter(e => e.type === this.selectedType);
+		}
 
 		// Apply campaign filter
 		if (this.campaignFilter !== 'all') {
@@ -365,11 +384,7 @@ export class AllElementsView extends ItemView {
 	 * Handle type filter toggle
 	 */
 	private handleTypeFilterToggle(type: string) {
-		if (this.typeFilter.has(type)) {
-			this.typeFilter.delete(type);
-		} else {
-			this.typeFilter.add(type);
-		}
+		this.selectedType = type;
 		this.render();
 	}
 
