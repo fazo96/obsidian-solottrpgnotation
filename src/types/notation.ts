@@ -179,6 +179,7 @@ export interface Session {
 	recap?: string;
 	goals?: string;
 	metadata: Map<string, string>;
+	linkedFile?: string;
 }
 
 export interface Campaign {

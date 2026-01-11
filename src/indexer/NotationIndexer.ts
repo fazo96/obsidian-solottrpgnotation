@@ -17,7 +17,7 @@ export class NotationIndexer {
 	constructor(app: App, settings: SoloRPGSettings) {
 		this.app = app;
 		this.settings = settings;
-		this.parser = new NotationParser();
+		this.parser = new NotationParser(app);
 		this.campaigns = new Map();
 	}
 
@@ -102,7 +102,7 @@ export class NotationIndexer {
 			}
 
 			const content = await this.app.vault.read(file);
-			const campaign = this.parser.parseCampaignFile(content, file.path);
+			const campaign = await this.parser.parseCampaignFile(content, file.path);
 			this.campaigns.set(file.path, campaign);
 
 			if (this.settings.debugMode) {

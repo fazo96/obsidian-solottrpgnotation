@@ -1,37 +1,37 @@
+import { App, TFile, parseYaml } from 'obsidian';
 import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference } from '../types/notation';
 import { CodeBlockParser } from './CodeBlockParser';
 import { TagExtractor } from './TagExtractor';
 import { ProgressParser } from './ProgressParser';
-import { parseYaml } from 'obsidian';
 
 /**
  * Main parser for Solo RPG Notation campaign files
  */
 export class NotationParser {
+	private app: App | undefined;
 	private codeBlockParser: CodeBlockParser;
 	private tagExtractor: TagExtractor;
 	private progressParser: ProgressParser;
 
-	constructor() {
+	constructor(app?: App) {
+		this.app = app;
 		this.codeBlockParser = new CodeBlockParser();
 		this.tagExtractor = new TagExtractor();
 		this.progressParser = new ProgressParser();
 	}
 
 	/**
-	 * Parse a complete campaign file
+	 * Parse a complete campaign file (async to support linked sessions)
 	 */
-	parseCampaignFile(content: string, filePath: string): Campaign {
-		const lines = content.split('\n');
-
+	async parseCampaignFile(content: string, filePath: string): Promise<Campaign> {
 		// Extract YAML frontmatter
 		const frontMatter = this.extractFrontMatter(content);
 
 		// Extract title from frontmatter or H1
 		const title = frontMatter.title || this.extractTitle(content);
 
-		// Parse sessions
-		const sessions = this.parseSessions(content, filePath);
+		// Parse sessions (both inline and linked)
+		const sessions = await this.parseSessions(content, filePath);
 
 		// Collect all tags across all sessions
 		const allTags = this.collectAllTags(sessions, filePath);
@@ -80,22 +80,31 @@ export class NotationParser {
 	}
 
 	/**
-	 * Parse all sessions in the content
+	 * Parse all sessions (inline and linked) in the content
 	 */
-	private parseSessions(content: string, filePath: string): Session[] {
+	private async parseSessions(content: string, filePath: string): Promise<Session[]> {
 		const sessions: Session[] = [];
 		const lines = content.split('\n');
+
+		// First pass: detect all session links
+		const sessionLinks = this.extractSessionLinks(content, filePath);
 
 		let currentSession: Session | null = null;
 		let currentSessionContent: string[] = [];
 		let sessionStartLine = 0;
+		let currentLineNumber = 0;
 
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
+		while (currentLineNumber < lines.length) {
+			const line = lines[currentLineNumber];
 
-			// Check for session header (## Session N)
-      // Also support italian version (## Sessione N)
+			// Check for inline session header (## Session N)
 			const sessionMatch = line.match(/^##\s+Sessione?\s+(\d+)/i);
+
+			// Check for session link (but only if not already in an inline session)
+			const linkMatch = currentSession === null ? sessionLinks.find(
+				l => l.lineNumber === currentLineNumber
+			) : undefined;
+
 			if (sessionMatch) {
 				// Save previous session
 				if (currentSession) {
@@ -104,17 +113,16 @@ export class NotationParser {
 						filePath,
 						sessionStartLine
 					);
-					currentSession.endLine = i - 1;
+					currentSession.endLine = currentLineNumber - 1;
 					sessions.push(currentSession);
 				}
 
-				// Start new session
+				// Start new inline session
 				const sessionNumber = parseInt(sessionMatch[1]);
-				sessionStartLine = i;
+				sessionStartLine = currentLineNumber;
 				currentSessionContent = [];
 
-				// Parse session metadata from next line
-				const metadata = this.parseSessionMetadata(lines[i + 1] || '');
+				const metadata = this.parseSessionMetadata(lines[currentLineNumber + 1] || '');
 
 				currentSession = {
 					number: sessionNumber,
@@ -123,16 +131,36 @@ export class NotationParser {
 					recap: metadata.get('Recap'),
 					goals: metadata.get('Goals'),
 					scenes: [],
-					startLine: i,
-					endLine: i,
+					startLine: currentLineNumber,
+					endLine: currentLineNumber,
 					metadata,
 				};
+				currentLineNumber++;
+			} else if (linkMatch && !currentSession) {
+				// Parse linked session
+				if (linkMatch.linkedFilePath) {
+					const linkedSession = await this.parseSessionFile(linkMatch.linkedFilePath, linkMatch.sessionNumber);
+					if (linkedSession) {
+						linkedSession.startLine = linkMatch.lineNumber;
+						linkedSession.endLine = linkMatch.lineNumber;
+						sessions.push(linkedSession);
+					} else {
+						console.warn(`Could not parse linked session: ${linkMatch.linkText}`);
+					}
+				} else {
+					console.warn(`Could not resolve session link: ${linkMatch.linkText}`);
+				}
+				currentLineNumber++;
 			} else if (currentSession) {
+				// Collect content for inline session
 				currentSessionContent.push(line);
+				currentLineNumber++;
+			} else {
+				currentLineNumber++;
 			}
 		}
 
-		// Save last session
+		// Save last inline session
 		if (currentSession) {
 			currentSession.scenes = this.parseScenes(
 				currentSessionContent.join('\n'),
@@ -142,6 +170,9 @@ export class NotationParser {
 			currentSession.endLine = lines.length - 1;
 			sessions.push(currentSession);
 		}
+
+		// Sort sessions by number
+		sessions.sort((a, b) => a.number - b.number);
 
 		return sessions;
 	}
@@ -165,6 +196,114 @@ export class NotationParser {
 		}
 
 		return metadata;
+	}
+
+	/**
+	 * Detect session links in content (e.g., [[Session 3]], [[Session 3|The Dungeon]])
+	 */
+	private extractSessionLinks(content: string, basePath: string): Array<{
+		lineNumber: number;
+		sessionNumber: number;
+		linkText: string;
+		linkedFilePath?: string;
+	}> {
+		const links: Array<{
+			lineNumber: number;
+			sessionNumber: number;
+			linkText: string;
+			linkedFilePath?: string;
+		}> = [];
+
+		const lines = content.split('\n');
+		const linkPattern = /\[\[(Session|Sessione)\s+(\d+)(?:\|[^\]]*)?\]\]/gi;
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			let match;
+
+			// Reset regex state for each line
+			linkPattern.lastIndex = 0;
+
+			while ((match = linkPattern.exec(line)) !== null) {
+				const sessionNumber = parseInt(match[2]);
+				const fullLink = match[0];
+
+				// Resolve link if app is available
+				let linkedFilePath: string | undefined;
+				if (this.app) {
+					const linkPath = fullLink.slice(2, -2);
+					const linkedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, basePath);
+					if (linkedFile) {
+						linkedFilePath = linkedFile.path;
+					}
+				}
+
+				links.push({
+					lineNumber: i,
+					sessionNumber,
+					linkText: fullLink,
+					linkedFilePath,
+				});
+			}
+		}
+
+		return links;
+	}
+
+	/**
+	 * Parse a standalone session file (linked note)
+	 */
+	private async parseSessionFile(filePath: string, sessionNumber: number): Promise<Session | null> {
+		try {
+			if (!this.app) {
+				console.warn('No app instance available, cannot parse linked session file:', filePath);
+				return null;
+			}
+
+			const file = this.app.vault.getAbstractFileByPath(filePath);
+			if (!file || !(file instanceof TFile)) {
+				console.warn('Linked session file not found or is not a file:', filePath);
+				return null;
+			}
+
+			const content = await this.app.vault.read(file);
+
+			// Parse metadata from first few lines
+			const lines = content.split('\n');
+			const metadata = this.parseSessionMetadata(lines[0] || '');
+
+			// Check for explicit recap and goals fields
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const recapMatch = line.match(/^\*\*Recap:\*\*\s*(.+)$/i);
+				if (recapMatch) {
+					metadata.set('Recap', recapMatch[1].trim());
+				}
+				const goalsMatch = line.match(/^\*\*Goals:\*\*\s*(.+)$/i);
+				if (goalsMatch) {
+					metadata.set('Goals', goalsMatch[1].trim());
+				}
+			}
+
+			// Parse scenes (session file contains only scenes, no session header)
+			const scenes = this.parseScenes(content, filePath, 0);
+
+			return {
+				number: sessionNumber,
+				date: metadata.get('Date'),
+				duration: metadata.get('Duration'),
+				recap: metadata.get('Recap'),
+				goals: metadata.get('Goals'),
+				scenes,
+				startLine: 0,
+				endLine: lines.length - 1,
+				metadata,
+				linkedFile: filePath,
+			};
+		} catch (error) {
+			console.error('Error parsing linked session file:', filePath, error);
+			return null;
+		}
 	}
 
 	/**
