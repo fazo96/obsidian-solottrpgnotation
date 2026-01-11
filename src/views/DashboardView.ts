@@ -227,7 +227,7 @@ export class DashboardView extends ItemView {
 			case 'PC':
 			case 'NPC':
 			case 'Location':
-				this.renderEntityCard(container, element.data as EntityCard);
+				this.renderEntityCard(container, element.data as EntityCard, element.elementType);
 				break;
 			case 'Thread':
 				this.renderThreadCard(container, element.data as Thread);
@@ -247,7 +247,7 @@ export class DashboardView extends ItemView {
 				break;
 			case 'TableLookup':
 			case 'Generator':
-				this.renderRandomEventCard(container, element.data as RandomEvent);
+				this.renderRandomEventCard(container, element.data as RandomEvent, element.elementType);
 				break;
 			case 'Reference':
 				this.renderReferenceCard(container, element.data as Reference);
@@ -593,9 +593,10 @@ export class DashboardView extends ItemView {
 		return getTimestamp(a) - getTimestamp(b);
 	}
 
-	private renderEntityCard(container: HTMLElement, entity: EntityCard) {
+	private renderEntityCard(container: HTMLElement, entity: EntityCard, elementType: 'PC' | 'NPC' | 'Location') {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
-		card.createDiv({ text: entity.name, cls: 'solo-rpg-element-name' });
+		const icon = ELEMENT_TYPE_INFO[elementType].icon;
+		card.createDiv({ text: `${icon} ${entity.name}`, cls: 'solo-rpg-element-name' });
 
 		if (entity.tags.length > 0) {
 			const tagsContainer = card.createDiv({ cls: 'solo-rpg-element-tags' });
@@ -610,11 +611,13 @@ export class DashboardView extends ItemView {
 
 	private renderThreadCard(container: HTMLElement, thread: Thread) {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
-		card.createDiv({ text: thread.name, cls: 'solo-rpg-element-name' });
+		const icon = ELEMENT_TYPE_INFO['Thread'].icon;
+		card.createDiv({ text: `${icon} ${thread.name}`, cls: 'solo-rpg-element-name' });
 
 		const stateColor = this.getThreadStateColor(thread.state);
 		const stateBadge = card.createSpan({ text: thread.state, cls: 'solo-rpg-tag' });
 		stateBadge.style.backgroundColor = stateColor;
+		stateBadge.style.color = 'var(--text-on-accent)';
 
 		this.renderMentionsMeta(card, thread.mentions);
 		this.attachNavigationHandler(card, thread.firstMention);
@@ -624,7 +627,8 @@ export class DashboardView extends ItemView {
 		const item = container.createDiv({ cls: 'solo-rpg-progress-item solo-rpg-element-card' });
 
 		const header = item.createDiv({ cls: 'solo-rpg-progress-header' });
-		header.createDiv({ text: clock.name, cls: 'solo-rpg-progress-name' });
+		const icon = clock.id.startsWith('clock:') ? ELEMENT_TYPE_INFO['Clock'].icon : ELEMENT_TYPE_INFO['Event'].icon;
+		header.createDiv({ text: `${icon} ${clock.name}`, cls: 'solo-rpg-progress-name' });
 		header.createDiv({ text: `${clock.current}/${clock.total}`, cls: 'solo-rpg-progress-value' });
 
 		if (this.settings.showProgressBars) {
@@ -655,7 +659,8 @@ export class DashboardView extends ItemView {
 		const item = container.createDiv({ cls: 'solo-rpg-progress-item solo-rpg-element-card' });
 
 		const header = item.createDiv({ cls: 'solo-rpg-progress-header' });
-		header.createDiv({ text: track.name, cls: 'solo-rpg-progress-name' });
+		const icon = ELEMENT_TYPE_INFO['Track'].icon;
+		header.createDiv({ text: `${icon} ${track.name}`, cls: 'solo-rpg-progress-name' });
 		header.createDiv({ text: `${track.current}/${track.total}`, cls: 'solo-rpg-progress-value' });
 
 		if (this.settings.showProgressBars) {
@@ -680,7 +685,8 @@ export class DashboardView extends ItemView {
 		const item = container.createDiv({ cls: 'solo-rpg-progress-item solo-rpg-element-card' });
 
 		const header = item.createDiv({ cls: 'solo-rpg-progress-header' });
-		header.createDiv({ text: timer.name, cls: 'solo-rpg-progress-name' });
+		const icon = ELEMENT_TYPE_INFO['Timer'].icon;
+		header.createDiv({ text: `${icon} ${timer.name}`, cls: 'solo-rpg-progress-name' });
 
 		const valueDiv = header.createDiv({ cls: 'solo-rpg-timer-value' });
 		if (this.progressParser.isTimerUrgent(timer.value)) {
@@ -703,9 +709,10 @@ export class DashboardView extends ItemView {
 	private renderMetaNoteCard(container: HTMLElement, noteCtx: MetaNoteWithContext) {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
 
+		const icon = ELEMENT_TYPE_INFO['MetaNote'].icon;
 		const categoryLabel = noteCtx.note.category.replace('_', ' ');
 		card.createDiv({
-			text: categoryLabel.charAt(0).toUpperCase() + categoryLabel.slice(1),
+			text: `${icon} ${categoryLabel.charAt(0).toUpperCase() + categoryLabel.slice(1)}`,
 			cls: 'solo-rpg-tag'
 		});
 
@@ -719,11 +726,12 @@ export class DashboardView extends ItemView {
 		this.attachNavigationHandler(card, noteCtx.location);
 	}
 
-	private renderRandomEventCard(container: HTMLElement, event: RandomEvent) {
+	private renderRandomEventCard(container: HTMLElement, event: RandomEvent, elementType: 'TableLookup' | 'Generator') {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
 
+		const icon = ELEMENT_TYPE_INFO[elementType].icon;
 		const typeText = event.type === 'table' ? 'Table Lookup' : 'Generator';
-		card.createDiv({ text: typeText, cls: 'solo-rpg-tag' });
+		card.createDiv({ text: `${icon} ${typeText}`, cls: 'solo-rpg-tag' });
 
 		if (event.type === 'table') {
 			const data = event.data as TableLookup;
@@ -744,8 +752,9 @@ export class DashboardView extends ItemView {
 	private renderReferenceCard(container: HTMLElement, reference: Reference) {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
 
+		const icon = ELEMENT_TYPE_INFO['Reference'].icon;
 		const nameContainer = card.createDiv({ cls: 'solo-rpg-element-name' });
-		nameContainer.createSpan({ text: reference.name });
+		nameContainer.createSpan({ text: `${icon} ${reference.name}` });
 		nameContainer.createSpan({ text: ` (${reference.type})`, cls: 'solo-rpg-tag' });
 
 		this.renderMentionsMeta(card, reference.mentions);
