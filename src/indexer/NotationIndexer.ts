@@ -89,6 +89,22 @@ export class NotationIndexer {
 	}
 
 	/**
+	 * Find which campaign a linked session file belongs to
+	 * @param sessionFilePath - Path to the session file
+	 * @returns Path to the campaign file, or null if not found
+	 */
+	private findCampaignForSessionFile(sessionFilePath: string): string | null {
+		for (const [campaignPath, campaign] of this.campaigns) {
+			for (const session of campaign.sessions) {
+				if (session.linkedFile === sessionFilePath) {
+					return campaignPath;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Index a single file
 	 */
 	async indexFile(file: TFile): Promise<void> {
@@ -131,7 +147,18 @@ export class NotationIndexer {
 		const modifyRef = this.app.vault.on('modify', async (file) => {
 			if (file instanceof TFile && file.extension === 'md') {
 				if (this.settings.parseOnFileSave && await this.isCampaignFile(file)) {
+          console.log('Detected modifiied file: campaign file')
 					await this.indexFile(file);
+				} else {
+					// Check if this is a linked session file
+					const campaignPath = this.findCampaignForSessionFile(file.path);
+					if (campaignPath) {
+						const campaignFile = this.app.vault.getAbstractFileByPath(campaignPath);
+            console.log('Detected modifiied file: found linked campaign file', campaignPath)
+						if (campaignFile instanceof TFile) {
+							await this.indexFile(campaignFile);
+						}
+					}
 				}
 			}
 		});
