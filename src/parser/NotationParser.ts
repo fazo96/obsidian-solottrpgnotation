@@ -88,6 +88,7 @@ export class NotationParser {
 
 		// First pass: detect all session links
 		const sessionLinks = this.extractSessionLinks(content, filePath);
+    console.log('sessionLinks', sessionLinks)
 
 		let currentSession: Session | null = null;
 		let currentSessionContent: string[] = [];
@@ -215,35 +216,50 @@ export class NotationParser {
 		}> = [];
 
 		const lines = content.split('\n');
-		const linkPattern = /\[\[(Session|Sessione)\s+(\d+(?:[^\]\|]*))(?:\|[^\]]*)?\]\]/gi;
+		const wikilinkPattern = /\[\[([^\]]+)\]\]/g;
+		const sessionPattern = /(?:^|\/)(Session|Sessione)\s+(\d+)/i;
 
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			let match;
 
-			// Reset regex state for each line
-			linkPattern.lastIndex = 0;
+			wikilinkPattern.lastIndex = 0;
 
-			while ((match = linkPattern.exec(line)) !== null) {
-				const sessionNumber = parseInt(match[2]);
+			while ((match = wikilinkPattern.exec(line)) !== null) {
 				const fullLink = match[0];
+				const linkContent = match[1];
 
-				// Resolve link if app is available
-				let linkedFilePath: string | undefined;
-				if (this.app) {
-					const linkPath = fullLink.slice(2, -2);
-					const linkedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, basePath);
-					if (linkedFile) {
-						linkedFilePath = linkedFile.path;
-					}
+				let linkPath = linkContent;
+				let linkAlias: string | undefined;
+
+				const pipeIndex = linkContent.indexOf('|');
+				if (pipeIndex !== -1) {
+					linkPath = linkContent.slice(0, pipeIndex);
+					linkAlias = linkContent.slice(pipeIndex + 1);
 				}
 
-				links.push({
-					lineNumber: i,
-					sessionNumber,
-					linkText: fullLink,
-					linkedFilePath,
-				});
+				const pathMatch = sessionPattern.exec(linkPath);
+				const aliasMatch = linkAlias ? sessionPattern.exec(linkAlias) : null;
+
+				if (pathMatch || aliasMatch) {
+					const sessionMatch = pathMatch || aliasMatch;
+					const sessionNumber = parseInt(sessionMatch![2]);
+
+					let linkedFilePath: string | undefined;
+					if (this.app) {
+						const linkedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, basePath);
+						if (linkedFile) {
+							linkedFilePath = linkedFile.path;
+						}
+					}
+
+					links.push({
+						lineNumber: i,
+						sessionNumber,
+						linkText: fullLink,
+						linkedFilePath,
+					});
+				}
 			}
 		}
 
