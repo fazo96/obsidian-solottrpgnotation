@@ -539,8 +539,17 @@ export class NotationParser {
 		for (const npc of npcs) {
 			const existing = merged.get(npc.id);
 			if (existing) {
-				// Add new tags and mentions
-				existing.tags.push(...npc.tags.filter(t => !existing.tags.includes(t)));
+				// Process tags: add regular tags, remove tags prefixed with '-'
+				for (const tag of npc.tags) {
+					if (tag.startsWith('-')) {
+						// Remove tag (strip the '-' prefix)
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter(t => t !== tagToRemove);
+					} else if (!existing.tags.includes(tag)) {
+						// Add new tag
+						existing.tags.push(tag);
+					}
+				}
 				existing.mentions.push(...npc.mentions);
 			} else {
 				merged.set(npc.id, { ...npc });
@@ -559,7 +568,17 @@ export class NotationParser {
 		for (const loc of locations) {
 			const existing = merged.get(loc.id);
 			if (existing) {
-				existing.tags.push(...loc.tags.filter(t => !existing.tags.includes(t)));
+				// Process tags: add regular tags, remove tags prefixed with '-'
+				for (const tag of loc.tags) {
+					if (tag.startsWith('-')) {
+						// Remove tag (strip the '-' prefix)
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter(t => t !== tagToRemove);
+					} else if (!existing.tags.includes(tag)) {
+						// Add new tag
+						existing.tags.push(tag);
+					}
+				}
 				existing.mentions.push(...loc.mentions);
 			} else {
 				merged.set(loc.id, { ...loc });
