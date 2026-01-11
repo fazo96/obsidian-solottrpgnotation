@@ -126,6 +126,13 @@ export interface PlayerCharacter {
 	mentions: Location[];
 }
 
+export interface EntityCard {
+	id: string;
+	name: string;
+	tags: string[];
+	firstMention: Location;
+	mentions: Location[];
+}
 
 // ========== Progress Tracking ==========
 
