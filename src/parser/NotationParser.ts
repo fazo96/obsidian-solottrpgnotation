@@ -94,7 +94,8 @@ export class NotationParser {
 			const line = lines[i];
 
 			// Check for session header (## Session N)
-			const sessionMatch = line.match(/^##\s+Session\s+(\d+)/i);
+      // Also support italian version (## Sessione N)
+			const sessionMatch = line.match(/^##\s+Sessione?\s+(\d+)/i);
 			if (sessionMatch) {
 				// Save previous session
 				if (currentSession) {
