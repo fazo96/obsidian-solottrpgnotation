@@ -9,6 +9,22 @@ export const VIEW_TYPE_DASHBOARD = 'solo-rpg-dashboard';
 type ScreenType = 'campaigns' | 'elements';
 type ElementType = 'All' | 'PC' | 'NPC' | 'Location' | 'Thread' | 'Clock' | 'Track' | 'Timer' | 'Event' | 'MetaNote' | 'TableLookup' | 'Generator' | 'Reference';
 
+const ELEMENT_TYPE_INFO: Record<ElementType, { icon: string; label: string }> = {
+	'All': { icon: '📋', label: 'All' },
+	'PC': { icon: '👤', label: 'PCs' },
+	'NPC': { icon: '👥', label: 'NPCs' },
+	'Location': { icon: '📍', label: 'Locations' },
+	'Thread': { icon: '🧵', label: 'Threads' },
+	'Clock': { icon: '⏰', label: 'Clocks' },
+	'Track': { icon: '📊', label: 'Tracks' },
+	'Timer': { icon: '⏱️', label: 'Timers' },
+	'Event': { icon: '🎯', label: 'Events' },
+	'MetaNote': { icon: '📝', label: 'Notes' },
+	'TableLookup': { icon: '🎲', label: 'Tables' },
+	'Generator': { icon: '⚙️', label: 'Generators' },
+	'Reference': { icon: '🔗', label: 'References' }
+};
+
 interface RandomEvent {
 	type: 'table' | 'generator';
 	data: TableLookup | Generator;
@@ -168,10 +184,20 @@ export class DashboardView extends ItemView {
 
 		const typeFilters = panel.createDiv({ cls: 'solo-rpg-type-filters' });
 		const types: ElementType[] = ['All', 'PC', 'NPC', 'Location', 'Thread', 'Clock', 'Track', 'Timer', 'Event', 'MetaNote', 'TableLookup', 'Generator', 'Reference'];
+		const counts = this.getElementCounts();
+
 		for (const type of types) {
+			const info = ELEMENT_TYPE_INFO[type];
+			const count = counts[type];
+			let text = `${info.icon} ${info.label}`;
+
+			if (count > 0 || type === 'All') {
+				text += ` (${count})`;
+			}
+
 			const chip = typeFilters.createDiv({
 				cls: `solo-rpg-type-chip ${this.currentElementType === type ? 'active' : ''}`,
-				text: type === 'TableLookup' ? 'Tables' : type,
+				text,
 			});
 			chip.addEventListener('click', () => {
 				this.currentElementType = type;
@@ -351,6 +377,67 @@ export class DashboardView extends ItemView {
 		const empty = container.createDiv({ cls: 'solo-rpg-empty-state' });
 		empty.createEl('p', { text: 'No elements found matching the current filters.' });
 		empty.createEl('p', { text: 'Try adjusting your filters or add game elements to your campaign.' });
+	}
+
+	private getElementCounts(): Record<ElementType, number> {
+		if (!this.selectedCampaign) {
+			return {
+				'All': 0,
+				'PC': 0,
+				'NPC': 0,
+				'Location': 0,
+				'Thread': 0,
+				'Clock': 0,
+				'Track': 0,
+				'Timer': 0,
+				'Event': 0,
+				'MetaNote': 0,
+				'TableLookup': 0,
+				'Generator': 0,
+				'Reference': 0
+			};
+		}
+
+		const campaign = this.selectedCampaign;
+		let metaNoteCount = 0;
+		let tableLookupCount = 0;
+		let generatorCount = 0;
+
+		for (const session of campaign.sessions) {
+			for (const scene of session.scenes) {
+				for (const element of scene.elements) {
+					if (element.type === 'meta_note') {
+						metaNoteCount++;
+					} else if (element.type === 'table_lookup') {
+						tableLookupCount++;
+					} else if (element.type === 'generator') {
+						generatorCount++;
+					}
+				}
+			}
+		}
+
+		const counts = {
+			'All': 0,
+			'PC': campaign.playerCharacters.size,
+			'NPC': campaign.npcs.size,
+			'Location': campaign.locations.size,
+			'Thread': campaign.threads.size,
+			'Clock': campaign.clocks.size,
+			'Track': campaign.tracks.size,
+			'Timer': campaign.timers.size,
+			'Event': campaign.events.size,
+			'MetaNote': metaNoteCount,
+			'TableLookup': tableLookupCount,
+			'Generator': generatorCount,
+			'Reference': campaign.references.size
+		};
+
+		counts['All'] = counts['PC'] + counts['NPC'] + counts['Location'] + counts['Thread'] +
+			counts['Clock'] + counts['Track'] + counts['Timer'] + counts['Event'] +
+			counts['MetaNote'] + counts['TableLookup'] + counts['Generator'] + counts['Reference'];
+
+		return counts;
 	}
 
 	private getFilteredElements(): ElementCardData[] {
