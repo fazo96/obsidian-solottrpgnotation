@@ -1,6 +1,6 @@
 import { App, TFile, EventRef } from 'obsidian';
 import { NotationParser } from '../parser/NotationParser';
-import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats } from '../types/notation';
+import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats, PlayerCharacter } from '../types/notation';
 import { SoloRPGSettings } from '../settings';
 
 /**
@@ -222,6 +222,17 @@ export class NotationIndexer {
 			threads.push(...Array.from(campaign.threads.values()));
 		}
 		return threads;
+	}
+
+	/**
+	 * Get all Player Characters across all campaigns
+	 */
+	getAllPlayerCharacters(): PlayerCharacter[] {
+		const pcs: PlayerCharacter[] = [];
+		for (const campaign of this.campaigns.values()) {
+			pcs.push(...Array.from(campaign.playerCharacters.values()));
+		}
+		return pcs;
 	}
 
 	/**

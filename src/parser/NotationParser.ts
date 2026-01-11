@@ -1,5 +1,5 @@
 import { App, TFile, parseYaml } from 'obsidian';
-import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference } from '../types/notation';
+import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference, PlayerCharacter } from '../types/notation';
 import { CodeBlockParser } from './CodeBlockParser';
 import { TagExtractor } from './TagExtractor';
 import { ProgressParser } from './ProgressParser';
@@ -625,17 +625,27 @@ export class NotationParser {
 	/**
 	 * Merge Player Characters
 	 */
-	private mergePlayerCharacters(pcs: any[]): Map<string, any> {
-		const merged = new Map();
+	private mergePlayerCharacters(pcs: PlayerCharacter[]): Map<string, PlayerCharacter> {
+		const merged = new Map<string, PlayerCharacter>();
 
 		for (const pc of pcs) {
 			const existing = merged.get(pc.id);
 			if (existing) {
-				// Merge stats
-				for (const [key, value] of pc.stats.entries()) {
-					existing.stats.set(key, value);
+				for (const tag of pc.tags) {
+					if (tag.startsWith('-')) {
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter((t: string) => t !== tagToRemove);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter((t: string) => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
+					}
 				}
-				existing.locations.push(...pc.locations);
+				existing.mentions.push(...pc.mentions);
 			} else {
 				merged.set(pc.id, { ...pc });
 			}

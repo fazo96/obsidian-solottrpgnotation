@@ -148,7 +148,9 @@ Click the dice icon (🎲) in the left sidebar to open the Campaign Dashboard, o
 #### Player Characters
 ```
 [PC:Name]                     - Simple PC mention
-[PC:Name|HP:12|Armor:3]      - PC with current stats
+[PC:Name|warrior|hero]        - PC with tags
+[PC:Name|HP:12|Armor:3]      - PC with stat-like tags
+[PC:Name|warrior|HP:12]       - PC with mixed tags
 ```
 
 ### Random Generation

@@ -121,8 +121,9 @@ export interface Thread {
 export interface PlayerCharacter {
 	id: string;
 	name: string;
-	stats: Map<string, string>;
-	locations: Location[];
+	tags: string[];
+	firstMention: Location;
+	mentions: Location[];
 }
 
 // ========== Progress Tracking ==========
