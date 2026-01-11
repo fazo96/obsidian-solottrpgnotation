@@ -215,7 +215,7 @@ export class NotationParser {
 		}> = [];
 
 		const lines = content.split('\n');
-		const linkPattern = /\[\[(Session|Sessione)\s+(\d+)(?:\|[^\]]*)?\]\]/gi;
+		const linkPattern = /\[\[(Session|Sessione)\s+(\d+(?:[^\]\|]*))(?:\|[^\]]*)?\]\]/gi;
 
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
