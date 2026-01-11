@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf, TFile, Notice } from 'obsidian';
 import { NotationIndexer } from '../indexer/NotationIndexer';
-import { Campaign, NPC, LocationTag, Thread, Reference, PlayerCharacter, Clock, Track, Timer, Event, Location, TableLookup, Generator, MetaNote } from '../types/notation';
+import { Campaign, NPC, LocationTag, Thread, Reference, PlayerCharacter, Clock, Track, Timer, Event, Location, TableLookup, Generator, MetaNote, EntityCard, Session, Scene, NotationElement } from '../types/notation';
 import { ProgressParser } from '../parser/ProgressParser';
 import { SoloRPGSettings } from '../settings';
 
@@ -225,13 +225,9 @@ export class DashboardView extends ItemView {
 	private renderElementCard(container: HTMLElement, element: ElementCardData) {
 		switch (element.elementType) {
 			case 'PC':
-				this.renderPCCard(container, element.data as PlayerCharacter);
-				break;
 			case 'NPC':
-				this.renderNPCCard(container, element.data as NPC);
-				break;
 			case 'Location':
-				this.renderLocationCard(container, element.data as LocationTag);
+				this.renderEntityCard(container, element.data as EntityCard);
 				break;
 			case 'Thread':
 				this.renderThreadCard(container, element.data as Thread);
@@ -399,23 +395,9 @@ export class DashboardView extends ItemView {
 		}
 
 		const campaign = this.selectedCampaign;
-		let metaNoteCount = 0;
-		let tableLookupCount = 0;
-		let generatorCount = 0;
-
-		for (const session of campaign.sessions) {
-			for (const scene of session.scenes) {
-				for (const element of scene.elements) {
-					if (element.type === 'meta_note') {
-						metaNoteCount++;
-					} else if (element.type === 'table_lookup') {
-						tableLookupCount++;
-					} else if (element.type === 'generator') {
-						generatorCount++;
-					}
-				}
-			}
-		}
+		const metaNoteResults = this.collectElementsByTypes(campaign, ['meta_note'], () => 1);
+		const tableLookupResults = this.collectElementsByTypes(campaign, ['table_lookup'], () => 1);
+		const generatorResults = this.collectElementsByTypes(campaign, ['generator'], () => 1);
 
 		const counts = {
 			'All': 0,
@@ -427,9 +409,9 @@ export class DashboardView extends ItemView {
 			'Track': campaign.tracks.size,
 			'Timer': campaign.timers.size,
 			'Event': campaign.events.size,
-			'MetaNote': metaNoteCount,
-			'TableLookup': tableLookupCount,
-			'Generator': generatorCount,
+			'MetaNote': metaNoteResults.length,
+			'TableLookup': tableLookupResults.length,
+			'Generator': generatorResults.length,
 			'Reference': campaign.references.size
 		};
 
@@ -523,49 +505,34 @@ export class DashboardView extends ItemView {
 	private getMetaNotes(): MetaNote[] {
 		if (!this.selectedCampaign) return [];
 
-		const notes: MetaNote[] = [];
 		const campaign = this.selectedCampaign;
 
-		for (const session of campaign.sessions) {
-			for (const scene of session.scenes) {
-				for (const element of scene.elements) {
-					if (element.type === 'meta_note') {
-						const location: Location = {
-							file: session.linkedFile || campaign.file,
-							lineNumber: element.lineNumber,
-							session: `Session ${session.number}`,
-							scene: scene.number,
-						};
-						notes.push({
-							note: element,
-							location,
-							session: `Session ${session.number}`,
-							scene: scene.number,
-						});
-					}
-				}
+		return this.collectElementsByTypes<MetaNote, MetaNote>(
+			campaign,
+			['meta_note'],
+			(element, session, scene) => {
+				const location = this.createLocation(session, scene, element, campaign);
+				return {
+					note: element,
+					location,
+					session: `Session ${session.number}`,
+					scene: scene.number,
+				};
 			}
-		}
-
-		return notes;
+		);
 	}
 
 	private getRandomEvents(): RandomEvent[] {
 		if (!this.selectedCampaign) return [];
 
-		const events: RandomEvent[] = [];
 		const campaign = this.selectedCampaign;
+		const events: RandomEvent[] = [];
 
 		for (const session of campaign.sessions) {
 			for (const scene of session.scenes) {
 				for (const element of scene.elements) {
 					if (element.type === 'table_lookup' && (this.currentElementType === 'All' || this.currentElementType === 'TableLookup')) {
-						const location: Location = {
-							file: session.linkedFile || campaign.file,
-							lineNumber: element.lineNumber,
-							session: `Session ${session.number}`,
-							scene: scene.number,
-						};
+						const location = this.createLocation(session, scene, element, campaign);
 						events.push({
 							type: 'table',
 							data: element,
@@ -575,12 +542,7 @@ export class DashboardView extends ItemView {
 							scene: scene.number,
 						});
 					} else if (element.type === 'generator' && (this.currentElementType === 'All' || this.currentElementType === 'Generator')) {
-						const location: Location = {
-							file: session.linkedFile || campaign.file,
-							lineNumber: element.lineNumber,
-							session: `Session ${session.number}`,
-							scene: scene.number,
-						};
+						const location = this.createLocation(session, scene, element, campaign);
 						events.push({
 							type: 'generator',
 							data: element,
@@ -631,70 +593,19 @@ export class DashboardView extends ItemView {
 		return getTimestamp(a) - getTimestamp(b);
 	}
 
-	private renderPCCard(container: HTMLElement, pc: PlayerCharacter) {
+	private renderEntityCard(container: HTMLElement, entity: EntityCard) {
 		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
-		card.createDiv({ text: pc.name, cls: 'solo-rpg-element-name' });
+		card.createDiv({ text: entity.name, cls: 'solo-rpg-element-name' });
 
-		if (pc.tags.length > 0) {
+		if (entity.tags.length > 0) {
 			const tagsContainer = card.createDiv({ cls: 'solo-rpg-element-tags' });
-			for (const tag of pc.tags) {
+			for (const tag of entity.tags) {
 				tagsContainer.createSpan({ text: tag, cls: 'solo-rpg-tag' });
 			}
 		}
 
-		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
-		meta.createSpan({ text: `Mentions: ${pc.mentions.length}` });
-
-		const lastMention = pc.mentions[pc.mentions.length - 1];
-		if (lastMention.session && lastMention.scene) {
-			meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
-		}
-
-		card.addEventListener('click', () => this.navigateToLocation(pc.firstMention.file, pc.firstMention.lineNumber));
-	}
-
-	private renderNPCCard(container: HTMLElement, npc: NPC) {
-		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
-		card.createDiv({ text: npc.name, cls: 'solo-rpg-element-name' });
-
-		if (npc.tags.length > 0) {
-			const tagsContainer = card.createDiv({ cls: 'solo-rpg-element-tags' });
-			for (const tag of npc.tags) {
-				tagsContainer.createSpan({ text: tag, cls: 'solo-rpg-tag' });
-			}
-		}
-
-		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
-		meta.createSpan({ text: `Mentions: ${npc.mentions.length}` });
-
-		const lastMention = npc.mentions[npc.mentions.length - 1];
-		if (lastMention.session && lastMention.scene) {
-			meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
-		}
-
-		card.addEventListener('click', () => this.navigateToLocation(npc.firstMention.file, npc.firstMention.lineNumber));
-	}
-
-	private renderLocationCard(container: HTMLElement, location: LocationTag) {
-		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
-		card.createDiv({ text: location.name, cls: 'solo-rpg-element-name' });
-
-		if (location.tags.length > 0) {
-			const tagsContainer = card.createDiv({ cls: 'solo-rpg-element-tags' });
-			for (const tag of location.tags) {
-				tagsContainer.createSpan({ text: tag, cls: 'solo-rpg-tag' });
-			}
-		}
-
-		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
-		meta.createSpan({ text: `Mentions: ${location.mentions.length}` });
-
-		const lastMention = location.mentions[location.mentions.length - 1];
-		if (lastMention.session && lastMention.scene) {
-			meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
-		}
-
-		card.addEventListener('click', () => this.navigateToLocation(location.firstMention.file, location.firstMention.lineNumber));
+		this.renderMentionsMeta(card, entity.mentions);
+		this.attachNavigationHandler(card, entity.firstMention);
 	}
 
 	private renderThreadCard(container: HTMLElement, thread: Thread) {
@@ -705,15 +616,8 @@ export class DashboardView extends ItemView {
 		const stateBadge = card.createSpan({ text: thread.state, cls: 'solo-rpg-tag' });
 		stateBadge.style.backgroundColor = stateColor;
 
-		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
-		meta.createSpan({ text: `Mentions: ${thread.mentions.length}` });
-
-		const lastMention = thread.mentions[thread.mentions.length - 1];
-		if (lastMention.session && lastMention.scene) {
-			meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
-		}
-
-		card.addEventListener('click', () => this.navigateToLocation(thread.firstMention.file, thread.firstMention.lineNumber));
+		this.renderMentionsMeta(card, thread.mentions);
+		this.attachNavigationHandler(card, thread.firstMention);
 	}
 
 	private renderClockCard(container: HTMLElement, clock: Clock | Event) {
@@ -744,12 +648,7 @@ export class DashboardView extends ItemView {
 			status.createSpan({ text: `${percentage}%` });
 		}
 
-		item.addEventListener('click', () => {
-			if (clock.locations.length > 0) {
-				const loc = clock.locations[0];
-				this.navigateToLocation(loc.file, loc.lineNumber);
-			}
-		});
+		this.attachLocationsNavigationHandler(item, clock.locations);
 	}
 
 	private renderTrackCard(container: HTMLElement, track: Track) {
@@ -774,12 +673,7 @@ export class DashboardView extends ItemView {
 			status.createSpan({ text: `${percentage}%` });
 		}
 
-		item.addEventListener('click', () => {
-			if (track.locations.length > 0) {
-				const loc = track.locations[0];
-				this.navigateToLocation(loc.file, loc.lineNumber);
-			}
-		});
+		this.attachLocationsNavigationHandler(item, track.locations);
 	}
 
 	private renderTimerCard(container: HTMLElement, timer: Timer) {
@@ -803,12 +697,7 @@ export class DashboardView extends ItemView {
 			status.createSpan({ text: `${timer.value} remaining` });
 		}
 
-		item.addEventListener('click', () => {
-			if (timer.locations.length > 0) {
-				const loc = timer.locations[0];
-				this.navigateToLocation(loc.file, loc.lineNumber);
-			}
-		});
+		this.attachLocationsNavigationHandler(item, timer.locations);
 	}
 
 	private renderMetaNoteCard(container: HTMLElement, noteCtx: MetaNoteWithContext) {
@@ -827,9 +716,7 @@ export class DashboardView extends ItemView {
 			meta.createSpan({ text: `${noteCtx.session}, ${noteCtx.scene}` });
 		}
 
-		card.addEventListener('click', () => {
-			this.navigateToLocation(noteCtx.location.file, noteCtx.location.lineNumber);
-		});
+		this.attachNavigationHandler(card, noteCtx.location);
 	}
 
 	private renderRandomEventCard(container: HTMLElement, event: RandomEvent) {
@@ -851,9 +738,7 @@ export class DashboardView extends ItemView {
 			meta.createSpan({ text: `${event.session}, ${event.scene}` });
 		}
 
-		card.addEventListener('click', () => {
-			this.navigateToLocation(event.location.file, event.location.lineNumber);
-		});
+		this.attachNavigationHandler(card, event.location);
 	}
 
 	private renderReferenceCard(container: HTMLElement, reference: Reference) {
@@ -863,19 +748,8 @@ export class DashboardView extends ItemView {
 		nameContainer.createSpan({ text: reference.name });
 		nameContainer.createSpan({ text: ` (${reference.type})`, cls: 'solo-rpg-tag' });
 
-		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
-		meta.createSpan({ text: `Mentions: ${reference.mentions.length}` });
-
-		if (reference.mentions.length > 0) {
-			const lastMention = reference.mentions[reference.mentions.length - 1];
-			if (lastMention.session && lastMention.scene) {
-				meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
-			}
-		}
-
-		card.addEventListener('click', () => {
-			this.navigateToLocation(reference.firstMention.file, reference.firstMention.lineNumber);
-		});
+		this.renderMentionsMeta(card, reference.mentions);
+		this.attachNavigationHandler(card, reference.firstMention);
 	}
 
 	private getThreadStateColor(state: string): string {
@@ -951,5 +825,54 @@ export class DashboardView extends ItemView {
 			console.error('Error navigating to location:', error);
 			new Notice('Could not navigate to location');
 		}
+	}
+
+	private attachNavigationHandler(element: HTMLElement, location: { file: string; lineNumber: number }): void {
+		element.addEventListener('click', () => this.navigateToLocation(location.file, location.lineNumber));
+	}
+
+	private attachLocationsNavigationHandler(element: HTMLElement, locations: { file: string; lineNumber: number }[]): void {
+		if (locations.length > 0) {
+			this.attachNavigationHandler(element, locations[0]);
+		}
+	}
+
+	private renderMentionsMeta(container: HTMLElement, mentions: Location[]): void {
+		const meta = container.createDiv({ cls: 'solo-rpg-element-meta' });
+		meta.createSpan({ text: `Mentions: ${mentions.length}` });
+
+		if (mentions.length > 0) {
+			const lastMention = mentions[mentions.length - 1];
+			if (lastMention.session && lastMention.scene) {
+				meta.createSpan({ text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}` });
+			}
+		}
+	}
+
+	private createLocation(session: Session, scene: Scene, element: NotationElement, campaign: Campaign): Location {
+		return {
+			file: session.linkedFile || campaign.file,
+			lineNumber: element.lineNumber,
+			session: `Session ${session.number}`,
+			scene: scene.number,
+		};
+	}
+
+	private collectElementsByTypes<T extends NotationElement, R>(
+		campaign: Campaign,
+		types: string[],
+		processor: (element: T, session: Session, scene: Scene) => R
+	): R[] {
+		const results: R[] = [];
+		for (const session of campaign.sessions) {
+			for (const scene of session.scenes) {
+				for (const element of scene.elements) {
+					if (types.includes(element.type)) {
+						results.push(processor(element as T, session, scene));
+					}
+				}
+			}
+		}
+		return results;
 	}
 }
