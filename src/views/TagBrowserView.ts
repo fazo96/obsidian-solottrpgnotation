@@ -4,14 +4,14 @@ import { NPC, LocationTag, Thread, Reference, PlayerCharacter } from '../types/n
 
 export const VIEW_TYPE_TAG_BROWSER = 'solo-rpg-tag-browser';
 
-type TabType = 'npcs' | 'locations' | 'threads' | 'references' | 'pcs';
+type TabType = 'pcs' | 'npcs' | 'locations' | 'threads' | 'references';
 
 /**
  * Tag browser view for NPCs, Locations, Threads, and PCs
  */
 export class TagBrowserView extends ItemView {
 	indexer: NotationIndexer;
-	private currentTab: TabType = 'npcs';
+	private currentTab: TabType = 'pcs';
 	private searchQuery: string = '';
 
 	constructor(leaf: WorkspaceLeaf, indexer: NotationIndexer) {
@@ -67,6 +67,15 @@ export class TagBrowserView extends ItemView {
 	private renderTabs(container: HTMLElement) {
 		const tabs = container.createDiv({ cls: 'solo-rpg-tabs' });
 
+		const pcTab = tabs.createDiv({
+			cls: `solo-rpg-tab ${this.currentTab === 'pcs' ? 'active' : ''}`,
+			text: 'PCs',
+		});
+		pcTab.addEventListener('click', () => {
+			this.currentTab = 'pcs';
+			this.render();
+		});
+
 		const npcTab = tabs.createDiv({
 			cls: `solo-rpg-tab ${this.currentTab === 'npcs' ? 'active' : ''}`,
 			text: 'NPCs',
@@ -102,15 +111,6 @@ export class TagBrowserView extends ItemView {
 			this.currentTab = 'references';
 			this.render();
 		});
-
-		const pcTab = tabs.createDiv({
-			cls: `solo-rpg-tab ${this.currentTab === 'pcs' ? 'active' : ''}`,
-			text: 'PCs',
-		});
-		pcTab.addEventListener('click', () => {
-			this.currentTab = 'pcs';
-			this.render();
-		});
 	}
 
 	/**
@@ -137,6 +137,9 @@ export class TagBrowserView extends ItemView {
 		const content = container.createDiv({ cls: 'solo-rpg-tab-content' });
 
 		switch (this.currentTab) {
+			case 'pcs':
+				this.renderPCs(content);
+				break;
 			case 'npcs':
 				this.renderNPCs(content);
 				break;
@@ -148,9 +151,6 @@ export class TagBrowserView extends ItemView {
 				break;
 			case 'references':
 				this.renderReferences(content);
-				break;
-			case 'pcs':
-				this.renderPCs(content);
 				break;
 		}
 	}
