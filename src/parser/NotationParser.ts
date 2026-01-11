@@ -438,7 +438,7 @@ export class NotationParser {
 			for (const scene of session.scenes) {
 				for (const element of scene.elements) {
 					const location: Location = {
-						file: filePath,
+						file: session.linkedFile || filePath,
 						lineNumber: element.lineNumber,
 						session: `Session ${session.number}`,
 						scene: scene.number,
