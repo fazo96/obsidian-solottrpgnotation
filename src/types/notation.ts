@@ -126,6 +126,7 @@ export interface PlayerCharacter {
 	mentions: Location[];
 }
 
+
 // ========== Progress Tracking ==========
 
 export interface Clock {
