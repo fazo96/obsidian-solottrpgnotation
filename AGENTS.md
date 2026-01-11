@@ -2,6 +2,30 @@
 
 This guide provides essential information for agentic coding agents working on this Obsidian plugin.
 
+## Agent Workflow
+
+**IMPORTANT:** After making ANY change to the codebase, you MUST:
+
+1. **Run tests**: `nix-shell -p nodejs_20 --run "npm run test"`
+2. **Run linting**: `nix-shell -p nodejs_20 --run "npm run lint"`
+
+Both tests and linting MUST pass before your changes are complete.
+
+### When to Update Tests
+
+You MUST update/add tests when:
+- **Fixing a bug** - Add a test that reproduces the bug and verifies the fix
+- **Adding a new feature** - Add tests covering the new functionality
+- **Changing how something works** - Update existing tests to match new behavior
+- **Refactoring** - Ensure tests still pass and cover the refactored code
+
+### Test Coverage Requirements
+
+- All parser logic should be unit tested
+- All indexer logic should be unit tested
+- Use the mock Obsidian API in `tests/__mocks__/obsidian.ts` to avoid file I/O
+- Use fixtures in `tests/fixtures/` for integration-style tests
+
 ## Build & Development Commands
 
 ```bash
@@ -9,9 +33,44 @@ npm run dev          # Development build with watch mode (rebuilds on file chang
 npm run build        # Production build to main.js
 npm run lint         # Lint TypeScript files
 npm run lint:fix     # Auto-fix linting issues
+npm run test         # Run unit tests (fast parallel execution)
+npm run test:watch   # Run tests in watch mode for development
+npm run test:ui      # Run tests with UI interface
+npm run test:coverage # Run tests with coverage report
 ```
 
-**Note:** This project has no test suite. Manual testing in Obsidian is required.
+## Testing
+
+The project uses **Vitest** for fast, parallel unit testing.
+
+### Test Structure
+
+```
+tests/
+├── __mocks__/           # Mock implementations of dependencies
+│   └── obsidian.ts      # Mock Obsidian API
+├── setup/               # Test setup and utilities
+│   ├── obsidian-mock.ts  # Mock classes for testing
+│   └── vitest-setup.ts   # Global test setup
+├── parser/              # Parser unit tests
+│   ├── CodeBlockParser.test.ts
+│   └── TagExtractor.test.ts
+├── indexer/             # Indexer unit tests
+└── fixtures/            # Test data files
+    └── synthetic-campaign.md  # Minimal test campaign
+```
+
+### Running Tests
+
+- Unit tests execute in parallel by default (4 workers)
+- Tests mock the Obsidian API to avoid requiring a real Obsidian instance
+- Fixtures directory contains synthetic campaign data for integration testing
+
+### Important Notes
+
+- Tests use parallel execution for speed (configured in vitest.config.ts)
+- All parser and indexer logic can be unit tested without file I/O
+- Manual testing in Obsidian still required for UI integration and edge cases
 
 ## Project Structure
 
