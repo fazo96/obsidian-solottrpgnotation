@@ -137,7 +137,7 @@ export class AllElementsView extends ItemView {
 			campaignSelect.style.width = '100%';
 			campaignSelect.style.padding = '4px';
 
-			const allOption = campaignSelect.createEl('option', { text: 'All Campaigns', value: 'all' });
+			campaignSelect.createEl('option', { text: 'All Campaigns', value: 'all' });
 			for (const campaign of campaigns) {
 				campaignSelect.createEl('option', { text: campaign.title, value: campaign.title });
 			}

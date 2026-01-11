@@ -1,5 +1,5 @@
 import { App, TFile, parseYaml } from 'obsidian';
-import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference, PlayerCharacter } from '../types/notation';
+import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference, PlayerCharacter, Clock, Track, Timer, Event as ProgressEvent, NotationElement } from '../types/notation';
 import { CodeBlockParser } from './CodeBlockParser';
 import { TagExtractor } from './TagExtractor';
 import { ProgressParser } from './ProgressParser';
@@ -59,7 +59,7 @@ export class NotationParser {
 	/**
 	 * Extract YAML frontmatter
 	 */
-	private extractFrontMatter(content: string): Record<string, any> {
+	private extractFrontMatter(content: string): Record<string, unknown> {
 		const match = content.match(/^---\n([\s\S]*?)\n---/);
 		if (!match) return {};
 
@@ -386,8 +386,8 @@ export class NotationParser {
 	/**
 	 * Parse scene content (find code blocks and parse notation)
 	 */
-	private parseSceneContent(content: string, filePath: string, baseLineNumber: number) {
-		const elements: any[] = [];
+	private parseSceneContent(content: string, filePath: string, baseLineNumber: number): NotationElement[] {
+		const elements: NotationElement[] = [];
 		const lines = content.split('\n');
 
 		let inCodeBlock = false;
@@ -427,11 +427,11 @@ export class NotationParser {
 		const allNPCs: NPC[] = [];
 		const allLocations: LocationTag[] = [];
 		const allThreads: Thread[] = [];
-		const allClocks: any[] = [];
-		const allTracks: any[] = [];
-		const allTimers: any[] = [];
-		const allEvents: any[] = [];
-		const allPCs: any[] = [];
+		const allClocks: Clock[] = [];
+		const allTracks: Track[] = [];
+		const allTimers: Timer[] = [];
+		const allEvents: ProgressEvent[] = [];
+		const allPCs: PlayerCharacter[] = [];
 		const allReferences: Reference[] = [];
 
 		for (const session of sessions) {

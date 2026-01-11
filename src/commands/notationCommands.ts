@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Notice } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import { TemplateManager } from '../templates/TemplateManager';
 import { getSnippets } from '../templates/snippets';
 
@@ -7,7 +7,7 @@ import { getSnippets } from '../templates/snippets';
  */
 export function registerNotationCommands(
 	app: App,
-	plugin: any,
+	plugin: Plugin,
 	templateManager: TemplateManager
 ) {
 	// Insert Campaign Template

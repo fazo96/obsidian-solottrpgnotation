@@ -1,6 +1,6 @@
 import { App, TFile, EventRef } from 'obsidian';
 import { NotationParser } from '../parser/NotationParser';
-import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats, PlayerCharacter } from '../types/notation';
+import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats, PlayerCharacter, ProgressElement } from '../types/notation';
 import { SoloRPGSettings } from '../settings';
 
 /**
@@ -238,8 +238,8 @@ export class NotationIndexer {
 	/**
 	 * Get all progress elements (clocks, tracks, timers, events)
 	 */
-	getAllProgressElements(): any[] {
-		const elements: any[] = [];
+	getAllProgressElements(): ProgressElement[] {
+		const elements: ProgressElement[] = [];
 		for (const campaign of this.campaigns.values()) {
 			elements.push(...Array.from(campaign.clocks.values()));
 			elements.push(...Array.from(campaign.tracks.values()));

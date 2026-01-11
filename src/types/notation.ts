@@ -186,7 +186,7 @@ export interface Session {
 export interface Campaign {
 	file: string;
 	title: string;
-	frontMatter: Record<string, any>;
+	frontMatter: Record<string, string>;
 	sessions: Session[];
 	npcs: Map<string, NPC>;
 	locations: Map<string, LocationTag>;
