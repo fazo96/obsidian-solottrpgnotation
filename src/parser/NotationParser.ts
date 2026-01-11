@@ -531,6 +531,14 @@ export class NotationParser {
 	}
 
 	/**
+	 * Get the key portion of a tag (name before '=' if present)
+	 */
+	private getTagKey(tag: string): string {
+		const equalsIndex = tag.indexOf('=');
+		return equalsIndex !== -1 ? tag.slice(0, equalsIndex) : tag;
+	}
+
+	/**
 	 * Merge NPCs (combine mentions of same NPC)
 	 */
 	private mergeNPCs(npcs: NPC[]): Map<string, NPC> {
@@ -539,15 +547,18 @@ export class NotationParser {
 		for (const npc of npcs) {
 			const existing = merged.get(npc.id);
 			if (existing) {
-				// Process tags: add regular tags, remove tags prefixed with '-'
 				for (const tag of npc.tags) {
 					if (tag.startsWith('-')) {
-						// Remove tag (strip the '-' prefix)
 						const tagToRemove = tag.slice(1);
 						existing.tags = existing.tags.filter(t => t !== tagToRemove);
-					} else if (!existing.tags.includes(tag)) {
-						// Add new tag
-						existing.tags.push(tag);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter(t => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
 					}
 				}
 				existing.mentions.push(...npc.mentions);
@@ -568,15 +579,18 @@ export class NotationParser {
 		for (const loc of locations) {
 			const existing = merged.get(loc.id);
 			if (existing) {
-				// Process tags: add regular tags, remove tags prefixed with '-'
 				for (const tag of loc.tags) {
 					if (tag.startsWith('-')) {
-						// Remove tag (strip the '-' prefix)
 						const tagToRemove = tag.slice(1);
 						existing.tags = existing.tags.filter(t => t !== tagToRemove);
-					} else if (!existing.tags.includes(tag)) {
-						// Add new tag
-						existing.tags.push(tag);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter(t => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
 					}
 				}
 				existing.mentions.push(...loc.mentions);
