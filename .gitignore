@@ -24,4 +24,6 @@ Thumbs.db
 .hotreload
 data.json
 node_modules/
-src/
+
+# Test coverage
+coverage/

@@ -148,7 +148,9 @@ Click the dice icon (🎲) in the left sidebar to open the Campaign Dashboard, o
 #### Player Characters
 ```
 [PC:Name]                     - Simple PC mention
-[PC:Name|HP:12|Armor:3]      - PC with current stats
+[PC:Name|warrior|hero]        - PC with tags
+[PC:Name|HP:12|Armor:3]      - PC with stat-like tags
+[PC:Name|warrior|HP:12]       - PC with mixed tags
 ```
 
 ### Random Generation
@@ -329,7 +331,7 @@ Open **Settings → Solo TTRPG Notation** to configure:
 ## Support
 
 - **Issues & Bugs**: [GitHub Issues](https://github.com/roberto-b/solorpgnotation/issues)
-- **Notation Spec**: See `solo_notation.md` for complete specification
+- **Notation Spec**: See [Solo TTRPG Notation](https://zeruhur.itch.io/solo-ttrpg-notation)
 - **Examples**: Check the `examples/` folder for sample campaigns
 
 ## Credits

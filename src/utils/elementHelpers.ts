@@ -193,27 +193,20 @@ export function normalizeEvent(event: Event, campaign: Campaign): UnifiedElement
 	};
 }
 
-/**
- * Normalize Player Character to UnifiedElement
- */
-export function normalizePC(pc: PlayerCharacter, campaign: Campaign): UnifiedElement {
-	const stats: string[] = [];
-	pc.stats.forEach((value, key) => {
-		stats.push(`${key}: ${value}`);
-	});
-
-	return {
-		id: pc.id,
-		name: pc.name,
-		type: 'PC',
-		campaign: getCampaignName(campaign),
-		tags: stats,
-		mentions: pc.locations.length,
-		lastSeen: pc.locations.length > 0
-			? formatLastSeen(pc.locations[pc.locations.length - 1])
-			: 'N/A',
-		navigateTo: pc.locations.length > 0
-			? pc.locations[0]
-			: { file: campaign.file, lineNumber: 0 },
-	};
-}
+	/**
+	 * Normalize Player Character to UnifiedElement
+	 */
+	export function normalizePC(pc: PlayerCharacter, campaign: Campaign): UnifiedElement {
+		return {
+			id: pc.id,
+			name: pc.name,
+			type: 'PC',
+			campaign: getCampaignName(campaign),
+			tags: pc.tags,
+			mentions: pc.mentions.length,
+			lastSeen: pc.mentions.length > 0
+				? formatLastSeen(pc.mentions[pc.mentions.length - 1])
+				: formatLastSeen(pc.firstMention),
+			navigateTo: pc.firstMention,
+		};
+	}

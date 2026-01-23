@@ -1,37 +1,37 @@
-import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference } from '../types/notation';
+import { App, TFile, parseYaml } from 'obsidian';
+import { Campaign, Session, Scene, Location, NPC, LocationTag, Thread, Reference, PlayerCharacter, Clock, Track, Timer, Event as ProgressEvent, NotationElement } from '../types/notation';
 import { CodeBlockParser } from './CodeBlockParser';
 import { TagExtractor } from './TagExtractor';
 import { ProgressParser } from './ProgressParser';
-import { parseYaml } from 'obsidian';
 
 /**
  * Main parser for Solo RPG Notation campaign files
  */
 export class NotationParser {
+	private app: App | undefined;
 	private codeBlockParser: CodeBlockParser;
 	private tagExtractor: TagExtractor;
 	private progressParser: ProgressParser;
 
-	constructor() {
+	constructor(app?: App) {
+		this.app = app;
 		this.codeBlockParser = new CodeBlockParser();
 		this.tagExtractor = new TagExtractor();
 		this.progressParser = new ProgressParser();
 	}
 
 	/**
-	 * Parse a complete campaign file
+	 * Parse a complete campaign file (async to support linked sessions)
 	 */
-	parseCampaignFile(content: string, filePath: string): Campaign {
-		const lines = content.split('\n');
-
+	async parseCampaignFile(content: string, filePath: string): Promise<Campaign> {
 		// Extract YAML frontmatter
 		const frontMatter = this.extractFrontMatter(content);
 
 		// Extract title from frontmatter or H1
 		const title = frontMatter.title || this.extractTitle(content);
 
-		// Parse sessions
-		const sessions = this.parseSessions(content, filePath);
+		// Parse sessions (both inline and linked)
+		const sessions = await this.parseSessions(content, filePath);
 
 		// Collect all tags across all sessions
 		const allTags = this.collectAllTags(sessions, filePath);
@@ -59,7 +59,7 @@ export class NotationParser {
 	/**
 	 * Extract YAML frontmatter
 	 */
-	private extractFrontMatter(content: string): Record<string, any> {
+	private extractFrontMatter(content: string): Record<string, unknown> {
 		const match = content.match(/^---\n([\s\S]*?)\n---/);
 		if (!match) return {};
 
@@ -80,21 +80,32 @@ export class NotationParser {
 	}
 
 	/**
-	 * Parse all sessions in the content
+	 * Parse all sessions (inline and linked) in the content
 	 */
-	private parseSessions(content: string, filePath: string): Session[] {
+	private async parseSessions(content: string, filePath: string): Promise<Session[]> {
 		const sessions: Session[] = [];
 		const lines = content.split('\n');
+
+		// First pass: detect all session links
+		const sessionLinks = this.extractSessionLinks(content, filePath);
+    console.log('sessionLinks', sessionLinks)
 
 		let currentSession: Session | null = null;
 		let currentSessionContent: string[] = [];
 		let sessionStartLine = 0;
+		let currentLineNumber = 0;
 
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
+		while (currentLineNumber < lines.length) {
+			const line = lines[currentLineNumber];
 
-			// Check for session header (## Session N)
-			const sessionMatch = line.match(/^##\s+Session\s+(\d+)/i);
+			// Check for inline session header (## Session N)
+			const sessionMatch = line.match(/^##\s+Sessione?\s+(\d+)/i);
+
+			// Check for session link (but only if not already in an inline session)
+			const linkMatch = currentSession === null ? sessionLinks.find(
+				l => l.lineNumber === currentLineNumber
+			) : undefined;
+
 			if (sessionMatch) {
 				// Save previous session
 				if (currentSession) {
@@ -103,17 +114,16 @@ export class NotationParser {
 						filePath,
 						sessionStartLine
 					);
-					currentSession.endLine = i - 1;
+					currentSession.endLine = currentLineNumber - 1;
 					sessions.push(currentSession);
 				}
 
-				// Start new session
+				// Start new inline session
 				const sessionNumber = parseInt(sessionMatch[1]);
-				sessionStartLine = i;
+				sessionStartLine = currentLineNumber;
 				currentSessionContent = [];
 
-				// Parse session metadata from next line
-				const metadata = this.parseSessionMetadata(lines[i + 1] || '');
+				const metadata = this.parseSessionMetadata(lines[currentLineNumber + 1] || '');
 
 				currentSession = {
 					number: sessionNumber,
@@ -122,16 +132,36 @@ export class NotationParser {
 					recap: metadata.get('Recap'),
 					goals: metadata.get('Goals'),
 					scenes: [],
-					startLine: i,
-					endLine: i,
+					startLine: currentLineNumber,
+					endLine: currentLineNumber,
 					metadata,
 				};
+				currentLineNumber++;
+			} else if (linkMatch && !currentSession) {
+				// Parse linked session
+				if (linkMatch.linkedFilePath) {
+					const linkedSession = await this.parseSessionFile(linkMatch.linkedFilePath, linkMatch.sessionNumber);
+					if (linkedSession) {
+						linkedSession.startLine = linkMatch.lineNumber;
+						linkedSession.endLine = linkMatch.lineNumber;
+						sessions.push(linkedSession);
+					} else {
+						console.warn(`Could not parse linked session: ${linkMatch.linkText}`);
+					}
+				} else {
+					console.warn(`Could not resolve session link: ${linkMatch.linkText}`);
+				}
+				currentLineNumber++;
 			} else if (currentSession) {
+				// Collect content for inline session
 				currentSessionContent.push(line);
+				currentLineNumber++;
+			} else {
+				currentLineNumber++;
 			}
 		}
 
-		// Save last session
+		// Save last inline session
 		if (currentSession) {
 			currentSession.scenes = this.parseScenes(
 				currentSessionContent.join('\n'),
@@ -141,6 +171,9 @@ export class NotationParser {
 			currentSession.endLine = lines.length - 1;
 			sessions.push(currentSession);
 		}
+
+		// Sort sessions by number
+		sessions.sort((a, b) => a.number - b.number);
 
 		return sessions;
 	}
@@ -164,6 +197,129 @@ export class NotationParser {
 		}
 
 		return metadata;
+	}
+
+	/**
+	 * Detect session links in content (e.g., [[Session 3]], [[Session 3|The Dungeon]])
+	 */
+	private extractSessionLinks(content: string, basePath: string): Array<{
+		lineNumber: number;
+		sessionNumber: number;
+		linkText: string;
+		linkedFilePath?: string;
+	}> {
+		const links: Array<{
+			lineNumber: number;
+			sessionNumber: number;
+			linkText: string;
+			linkedFilePath?: string;
+		}> = [];
+
+		const lines = content.split('\n');
+		const wikilinkPattern = /\[\[([^\]]+)\]\]/g;
+		const sessionPattern = /(?:^|\/)(Session|Sessione)\s+(\d+)/i;
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			let match;
+
+			wikilinkPattern.lastIndex = 0;
+
+			while ((match = wikilinkPattern.exec(line)) !== null) {
+				const fullLink = match[0];
+				const linkContent = match[1];
+
+				let linkPath = linkContent;
+				let linkAlias: string | undefined;
+
+				const pipeIndex = linkContent.indexOf('|');
+				if (pipeIndex !== -1) {
+					linkPath = linkContent.slice(0, pipeIndex);
+					linkAlias = linkContent.slice(pipeIndex + 1);
+				}
+
+				const pathMatch = sessionPattern.exec(linkPath);
+				const aliasMatch = linkAlias ? sessionPattern.exec(linkAlias) : null;
+
+				if (pathMatch || aliasMatch) {
+					const sessionMatch = pathMatch || aliasMatch;
+					const sessionNumber = parseInt(sessionMatch![2]);
+
+					let linkedFilePath: string | undefined;
+					if (this.app) {
+						const linkedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, basePath);
+						if (linkedFile) {
+							linkedFilePath = linkedFile.path;
+						}
+					}
+
+					links.push({
+						lineNumber: i,
+						sessionNumber,
+						linkText: fullLink,
+						linkedFilePath,
+					});
+				}
+			}
+		}
+
+		return links;
+	}
+
+	/**
+	 * Parse a standalone session file (linked note)
+	 */
+	private async parseSessionFile(filePath: string, sessionNumber: number): Promise<Session | null> {
+		try {
+			if (!this.app) {
+				console.warn('No app instance available, cannot parse linked session file:', filePath);
+				return null;
+			}
+
+			const file = this.app.vault.getAbstractFileByPath(filePath);
+			if (!file || !(file instanceof TFile)) {
+				console.warn('Linked session file not found or is not a file:', filePath);
+				return null;
+			}
+
+			const content = await this.app.vault.read(file);
+
+			// Parse metadata from first few lines
+			const lines = content.split('\n');
+			const metadata = this.parseSessionMetadata(lines[0] || '');
+
+			// Check for explicit recap and goals fields
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const recapMatch = line.match(/^\*\*Recap:\*\*\s*(.+)$/i);
+				if (recapMatch) {
+					metadata.set('Recap', recapMatch[1].trim());
+				}
+				const goalsMatch = line.match(/^\*\*Goals:\*\*\s*(.+)$/i);
+				if (goalsMatch) {
+					metadata.set('Goals', goalsMatch[1].trim());
+				}
+			}
+
+			// Parse scenes (session file contains only scenes, no session header)
+			const scenes = this.parseScenes(content, filePath, 0);
+
+			return {
+				number: sessionNumber,
+				date: metadata.get('Date'),
+				duration: metadata.get('Duration'),
+				recap: metadata.get('Recap'),
+				goals: metadata.get('Goals'),
+				scenes,
+				startLine: 0,
+				endLine: lines.length - 1,
+				metadata,
+				linkedFile: filePath,
+			};
+		} catch (error) {
+			console.error('Error parsing linked session file:', filePath, error);
+			return null;
+		}
 	}
 
 	/**
@@ -230,8 +386,8 @@ export class NotationParser {
 	/**
 	 * Parse scene content (find code blocks and parse notation)
 	 */
-	private parseSceneContent(content: string, filePath: string, baseLineNumber: number) {
-		const elements: any[] = [];
+	private parseSceneContent(content: string, filePath: string, baseLineNumber: number): NotationElement[] {
+		const elements: NotationElement[] = [];
 		const lines = content.split('\n');
 
 		let inCodeBlock = false;
@@ -271,18 +427,18 @@ export class NotationParser {
 		const allNPCs: NPC[] = [];
 		const allLocations: LocationTag[] = [];
 		const allThreads: Thread[] = [];
-		const allClocks: any[] = [];
-		const allTracks: any[] = [];
-		const allTimers: any[] = [];
-		const allEvents: any[] = [];
-		const allPCs: any[] = [];
+		const allClocks: Clock[] = [];
+		const allTracks: Track[] = [];
+		const allTimers: Timer[] = [];
+		const allEvents: ProgressEvent[] = [];
+		const allPCs: PlayerCharacter[] = [];
 		const allReferences: Reference[] = [];
 
 		for (const session of sessions) {
 			for (const scene of session.scenes) {
 				for (const element of scene.elements) {
 					const location: Location = {
-						file: filePath,
+						file: session.linkedFile || filePath,
 						lineNumber: element.lineNumber,
 						session: `Session ${session.number}`,
 						scene: scene.number,
@@ -375,6 +531,14 @@ export class NotationParser {
 	}
 
 	/**
+	 * Get the key portion of a tag (name before '=' if present)
+	 */
+	private getTagKey(tag: string): string {
+		const equalsIndex = tag.indexOf('=');
+		return equalsIndex !== -1 ? tag.slice(0, equalsIndex) : tag;
+	}
+
+	/**
 	 * Merge NPCs (combine mentions of same NPC)
 	 */
 	private mergeNPCs(npcs: NPC[]): Map<string, NPC> {
@@ -383,8 +547,20 @@ export class NotationParser {
 		for (const npc of npcs) {
 			const existing = merged.get(npc.id);
 			if (existing) {
-				// Add new tags and mentions
-				existing.tags.push(...npc.tags.filter(t => !existing.tags.includes(t)));
+				for (const tag of npc.tags) {
+					if (tag.startsWith('-')) {
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter(t => t !== tagToRemove);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter(t => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
+					}
+				}
 				existing.mentions.push(...npc.mentions);
 			} else {
 				merged.set(npc.id, { ...npc });
@@ -403,7 +579,20 @@ export class NotationParser {
 		for (const loc of locations) {
 			const existing = merged.get(loc.id);
 			if (existing) {
-				existing.tags.push(...loc.tags.filter(t => !existing.tags.includes(t)));
+				for (const tag of loc.tags) {
+					if (tag.startsWith('-')) {
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter(t => t !== tagToRemove);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter(t => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
+					}
+				}
 				existing.mentions.push(...loc.mentions);
 			} else {
 				merged.set(loc.id, { ...loc });
@@ -436,17 +625,27 @@ export class NotationParser {
 	/**
 	 * Merge Player Characters
 	 */
-	private mergePlayerCharacters(pcs: any[]): Map<string, any> {
-		const merged = new Map();
+	private mergePlayerCharacters(pcs: PlayerCharacter[]): Map<string, PlayerCharacter> {
+		const merged = new Map<string, PlayerCharacter>();
 
 		for (const pc of pcs) {
 			const existing = merged.get(pc.id);
 			if (existing) {
-				// Merge stats
-				for (const [key, value] of pc.stats.entries()) {
-					existing.stats.set(key, value);
+				for (const tag of pc.tags) {
+					if (tag.startsWith('-')) {
+						const tagToRemove = tag.slice(1);
+						existing.tags = existing.tags.filter((t: string) => t !== tagToRemove);
+					} else {
+						const newTagKey = this.getTagKey(tag);
+						if (newTagKey !== tag) {
+							existing.tags = existing.tags.filter((t: string) => this.getTagKey(t) !== newTagKey);
+						}
+						if (!existing.tags.includes(tag)) {
+							existing.tags.push(tag);
+						}
+					}
 				}
-				existing.locations.push(...pc.locations);
+				existing.mentions.push(...pc.mentions);
 			} else {
 				merged.set(pc.id, { ...pc });
 			}

@@ -8,6 +8,7 @@ import {
 	TableLookup,
 	Generator,
 	MetaNote,
+	TextLine,
 } from '../types/notation';
 
 /**
@@ -213,7 +214,7 @@ export class CodeBlockParser {
 	/**
 	 * Parse other text lines (bare tags, dialogue, narrative, etc.)
 	 */
-	private parseTextLine(line: string, lineNumber: number): any {
+	private parseTextLine(line: string, lineNumber: number): TextLine {
 		return {
 			type: 'text',
 			content: line,

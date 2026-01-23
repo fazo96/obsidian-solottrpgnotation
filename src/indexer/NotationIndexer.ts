@@ -1,6 +1,6 @@
 import { App, TFile, EventRef } from 'obsidian';
 import { NotationParser } from '../parser/NotationParser';
-import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats } from '../types/notation';
+import { Campaign, NPC, LocationTag, Thread, SearchResults, CampaignStats, PlayerCharacter, ProgressElement } from '../types/notation';
 import { SoloRPGSettings } from '../settings';
 
 /**
@@ -17,7 +17,7 @@ export class NotationIndexer {
 	constructor(app: App, settings: SoloRPGSettings) {
 		this.app = app;
 		this.settings = settings;
-		this.parser = new NotationParser();
+		this.parser = new NotationParser(app);
 		this.campaigns = new Map();
 	}
 
@@ -102,7 +102,7 @@ export class NotationIndexer {
 			}
 
 			const content = await this.app.vault.read(file);
-			const campaign = this.parser.parseCampaignFile(content, file.path);
+			const campaign = await this.parser.parseCampaignFile(content, file.path);
 			this.campaigns.set(file.path, campaign);
 
 			if (this.settings.debugMode) {
@@ -225,10 +225,21 @@ export class NotationIndexer {
 	}
 
 	/**
+	 * Get all Player Characters across all campaigns
+	 */
+	getAllPlayerCharacters(): PlayerCharacter[] {
+		const pcs: PlayerCharacter[] = [];
+		for (const campaign of this.campaigns.values()) {
+			pcs.push(...Array.from(campaign.playerCharacters.values()));
+		}
+		return pcs;
+	}
+
+	/**
 	 * Get all progress elements (clocks, tracks, timers, events)
 	 */
-	getAllProgressElements(): any[] {
-		const elements: any[] = [];
+	getAllProgressElements(): ProgressElement[] {
+		const elements: ProgressElement[] = [];
 		for (const campaign of this.campaigns.values()) {
 			elements.push(...Array.from(campaign.clocks.values()));
 			elements.push(...Array.from(campaign.tracks.values()));

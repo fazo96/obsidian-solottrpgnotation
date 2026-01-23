@@ -1,17 +1,17 @@
 import { ItemView, WorkspaceLeaf, TFile, Notice } from 'obsidian';
 import { NotationIndexer } from '../indexer/NotationIndexer';
-import { NPC, LocationTag, Thread, Reference } from '../types/notation';
+import { NPC, LocationTag, Thread, Reference, PlayerCharacter } from '../types/notation';
 
 export const VIEW_TYPE_TAG_BROWSER = 'solo-rpg-tag-browser';
 
-type TabType = 'npcs' | 'locations' | 'threads' | 'references';
+type TabType = 'pcs' | 'npcs' | 'locations' | 'threads' | 'references';
 
 /**
- * Tag browser view for NPCs, Locations, and Threads
+ * Tag browser view for NPCs, Locations, Threads, and PCs
  */
 export class TagBrowserView extends ItemView {
 	indexer: NotationIndexer;
-	private currentTab: TabType = 'npcs';
+	private currentTab: TabType = 'pcs';
 	private searchQuery: string = '';
 
 	constructor(leaf: WorkspaceLeaf, indexer: NotationIndexer) {
@@ -66,6 +66,15 @@ export class TagBrowserView extends ItemView {
 	 */
 	private renderTabs(container: HTMLElement) {
 		const tabs = container.createDiv({ cls: 'solo-rpg-tabs' });
+
+		const pcTab = tabs.createDiv({
+			cls: `solo-rpg-tab ${this.currentTab === 'pcs' ? 'active' : ''}`,
+			text: 'PCs',
+		});
+		pcTab.addEventListener('click', () => {
+			this.currentTab = 'pcs';
+			this.render();
+		});
 
 		const npcTab = tabs.createDiv({
 			cls: `solo-rpg-tab ${this.currentTab === 'npcs' ? 'active' : ''}`,
@@ -128,6 +137,9 @@ export class TagBrowserView extends ItemView {
 		const content = container.createDiv({ cls: 'solo-rpg-tab-content' });
 
 		switch (this.currentTab) {
+			case 'pcs':
+				this.renderPCs(content);
+				break;
 			case 'npcs':
 				this.renderNPCs(content);
 				break;
@@ -417,7 +429,7 @@ export class TagBrowserView extends ItemView {
 		nameContainer.createSpan({ text: reference.name });
 
 		// Type badge
-		const typeBadge = nameContainer.createSpan({
+		nameContainer.createSpan({
 			text: ` (${reference.type})`,
 			cls: 'solo-rpg-tag'
 		});
@@ -442,6 +454,73 @@ export class TagBrowserView extends ItemView {
 				reference.firstMention.file,
 				reference.firstMention.lineNumber
 			);
+		});
+	}
+
+	/**
+	 * Render PCs list
+	 */
+	private renderPCs(container: HTMLElement) {
+		let pcs = this.indexer.getAllPlayerCharacters();
+
+		if (this.searchQuery) {
+			const query = this.searchQuery.toLowerCase();
+			pcs = pcs.filter(
+				(pc) =>
+					pc.name.toLowerCase().includes(query) ||
+					pc.tags.some((tag) => tag.toLowerCase().includes(query))
+			);
+		}
+
+		if (pcs.length === 0) {
+			this.renderEmptyState(
+				container,
+				'No PCs found',
+				'Create one with notation: [PC:Name|tags] in a code block'
+			);
+			return;
+		}
+
+		const list = container.createDiv({ cls: 'solo-rpg-element-list' });
+
+		for (const pc of pcs) {
+			this.renderPCCard(list, pc);
+		}
+	}
+
+	/**
+	 * Render a single PC card
+	 */
+	private renderPCCard(container: HTMLElement, pc: PlayerCharacter) {
+		const card = container.createDiv({ cls: 'solo-rpg-element-card' });
+
+		card.createDiv({
+			text: pc.name,
+			cls: 'solo-rpg-element-name',
+		});
+
+		if (pc.tags.length > 0) {
+			const tagsContainer = card.createDiv({ cls: 'solo-rpg-element-tags' });
+			for (const tag of pc.tags) {
+				tagsContainer.createSpan({
+					text: tag,
+					cls: 'solo-rpg-tag',
+				});
+			}
+		}
+
+		const meta = card.createDiv({ cls: 'solo-rpg-element-meta' });
+		meta.createSpan({ text: `Mentions: ${pc.mentions.length}` });
+
+		const lastMention = pc.mentions[pc.mentions.length - 1];
+		if (lastMention.session && lastMention.scene) {
+			meta.createSpan({
+				text: ` | Last seen: ${lastMention.session}, ${lastMention.scene}`,
+			});
+		}
+
+		card.addEventListener('click', () => {
+			this.navigateToLocation(pc.firstMention.file, pc.firstMention.lineNumber);
 		});
 	}
 

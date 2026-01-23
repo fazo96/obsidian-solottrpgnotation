@@ -61,6 +61,7 @@
 
 .solo-rpg-campaign-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   font-size: 0.9em;
   color: var(--text-muted);

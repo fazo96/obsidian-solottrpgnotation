@@ -229,25 +229,15 @@ export class TagExtractor {
 
 		while ((match = pattern.exec(content)) !== null) {
 			const name = match[1].trim();
-			const statsStr = match[2] || '';
-			const stats = new Map<string, string>();
-
-			// Parse stats (format: key:value or key value)
-			if (statsStr) {
-				const statPairs = statsStr.split('|');
-				for (const pair of statPairs) {
-					const [key, value] = pair.split(/[:=]/).map(s => s.trim());
-					if (key && value) {
-						stats.set(key, value);
-					}
-				}
-			}
+			const tagsStr = match[2] || '';
+			const tags = tagsStr.split('|').map(t => t.trim()).filter(t => t);
 
 			pcs.push({
 				id: `pc:${name.toLowerCase()}`,
 				name,
-				stats,
-				locations: [location],
+				tags,
+				firstMention: location,
+				mentions: [location],
 			});
 		}
 

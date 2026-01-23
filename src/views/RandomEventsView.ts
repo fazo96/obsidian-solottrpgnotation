@@ -170,7 +170,7 @@ export class RandomEventsView extends ItemView {
 
 						if (shouldInclude && eventType) {
 							const location: Location = {
-								file: campaign.file,
+								file: session.linkedFile || campaign.file,
 								lineNumber: element.lineNumber,
 								session: `Session ${session.number}`,
 								scene: scene.number,

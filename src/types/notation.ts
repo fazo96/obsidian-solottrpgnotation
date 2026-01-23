@@ -121,8 +121,9 @@ export interface Thread {
 export interface PlayerCharacter {
 	id: string;
 	name: string;
-	stats: Map<string, string>;
-	locations: Location[];
+	tags: string[];
+	firstMention: Location;
+	mentions: Location[];
 }
 
 // ========== Progress Tracking ==========
@@ -179,12 +180,13 @@ export interface Session {
 	recap?: string;
 	goals?: string;
 	metadata: Map<string, string>;
+	linkedFile?: string;
 }
 
 export interface Campaign {
 	file: string;
 	title: string;
-	frontMatter: Record<string, any>;
+	frontMatter: Record<string, string>;
 	sessions: Session[];
 	npcs: Map<string, NPC>;
 	locations: Map<string, LocationTag>;
