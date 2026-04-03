@@ -24,8 +24,8 @@ notes: {{notes}}
 ### S1 *{{scene_context}}*
 
 ```
-> {{action}}
-d: {{roll}} => {{outcome}}
+@ {{action}}
+d: {{roll}} -> {{outcome}}
 => {{consequence}}
 ```
 

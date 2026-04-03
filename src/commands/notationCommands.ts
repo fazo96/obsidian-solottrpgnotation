@@ -3,7 +3,7 @@ import { TemplateManager } from '../templates/TemplateManager';
 import { getSnippets } from '../templates/snippets';
 
 /**
- * Register all Solo RPG Notation commands
+ * Register all Lonelog notation commands
  */
 export function registerNotationCommands(
 	app: App,
@@ -72,7 +72,7 @@ export function registerNotationCommands(
 		id: 'insert-action-snippet',
 		name: 'Insert Action Snippet',
 		editorCallback: (editor: Editor) => {
-			const snippet = '> action\nd: roll => outcome\n=> consequence';
+			const snippet = '@ action\nd: roll -> outcome\n=> consequence';
 			editor.replaceRange(snippet, editor.getCursor());
 		}
 	});
@@ -147,13 +147,13 @@ export function registerNotationCommands(
 		}
 	});
 
-	// Insert Action Symbol (>)
+	// Insert Action Symbol (@)
 	plugin.addCommand({
 		id: 'insert-action-symbol',
-		name: 'Insert Action Symbol (>)',
+		name: 'Insert Action Symbol (@)',
 		editorCallback: (editor: Editor) => {
 			const cursor = editor.getCursor();
-			editor.replaceRange('> ', cursor);
+			editor.replaceRange('@ ', cursor);
 			editor.setCursor({
 				line: cursor.line,
 				ch: cursor.ch + 2
@@ -189,10 +189,10 @@ export function registerNotationCommands(
 		}
 	});
 
-	// Insert Oracle Result Symbol (->)
+	// Insert Resolution Symbol (->)
 	plugin.addCommand({
 		id: 'insert-oracle-result-symbol',
-		name: 'Insert Oracle Result Symbol (->)',
+		name: 'Insert Resolution Symbol (->)',
 		editorCallback: (editor: Editor) => {
 			const cursor = editor.getCursor();
 			editor.replaceRange('-> ', cursor);
@@ -223,7 +223,7 @@ export function registerNotationCommands(
 		name: 'Insert Table Lookup (tbl:)',
 		editorCallback: (editor: Editor) => {
 			const cursor = editor.getCursor();
-			editor.replaceRange('tbl: d100= => result', cursor);
+			editor.replaceRange('tbl: d100= -> result', cursor);
 			editor.setCursor({
 				line: cursor.line,
 				ch: cursor.ch + 10
@@ -237,7 +237,7 @@ export function registerNotationCommands(
 		name: 'Insert Generator (gen:)',
 		editorCallback: (editor: Editor) => {
 			const cursor = editor.getCursor();
-			editor.replaceRange('gen: System => result', cursor);
+			editor.replaceRange('gen: System -> result', cursor);
 			editor.setCursor({
 				line: cursor.line,
 				ch: cursor.ch + 5

@@ -11,7 +11,7 @@ export default class SoloRPGNotationPlugin extends Plugin {
 	indexer: NotationIndexer;
 
 	async onload() {
-		console.log('Loading Solo RPG Notation plugin');
+		console.log('Loading Lonelog plugin');
 
 		await this.loadSettings();
 
@@ -31,15 +31,15 @@ export default class SoloRPGNotationPlugin extends Plugin {
 
 		this.addSettingTab(new SoloRPGSettingTab(this.app, this));
 
-		this.addRibbonIcon('dice', 'Solo RPG Notation', () => {
+		this.addRibbonIcon('dice', 'Lonelog', () => {
 			this.activateView(VIEW_TYPE_DASHBOARD);
 		});
 
-		console.log('Solo RPG Notation plugin loaded successfully');
+		console.log('Lonelog plugin loaded successfully');
 	}
 
 	async onunload() {
-		console.log('Unloading Solo RPG Notation plugin');
+		console.log('Unloading Lonelog plugin');
 
 		if (this.indexer) {
 			this.indexer.cleanup();
@@ -114,7 +114,7 @@ export default class SoloRPGNotationPlugin extends Plugin {
 				const locations = this.indexer.getAllLocations();
 				const threads = this.indexer.getAllThreads();
 
-				console.log('=== Solo RPG Notation Index Stats ===');
+				console.log('=== Lonelog Index Stats ===');
 				console.log(`Campaigns: ${campaigns.length}`);
 				console.log(`NPCs: ${npcs.length}`);
 				console.log(`Locations: ${locations.length}`);

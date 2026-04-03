@@ -1,10 +1,10 @@
 {
   "id": "solo-ttrpg-notation",
-  "name": "Solo TTRPG Notation",
+  "name": "Lonelog",
   "version": "1.0.0",
   "minAppVersion": "1.4.0",
-  "description": "A plugin for recording and tracking solo tabletop RPG sessions using a standardized notation system.",
+  "description": "A plugin for recording and tracking solo tabletop RPG sessions using the Lonelog notation system.",
   "author": "Roberto Bisceglie",
-  "authorUrl": "https://github.com/roberto-b/solorpgnotation",
+  "authorUrl": "https://github.com/zeruhur/lonelog",
   "isDesktopOnly": false
 }

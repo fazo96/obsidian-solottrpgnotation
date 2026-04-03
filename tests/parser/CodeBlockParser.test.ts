@@ -193,6 +193,88 @@ d: Line 3`;
 		});
 	});
 
+	describe('Lonelog-style notation (@ actions, -> resolutions)', () => {
+		it('should parse @ action lines', () => {
+			const content = '@ The hero draws their sword';
+			const result = parser.parseCodeBlock(content, 10);
+
+			expect(result).toHaveLength(1);
+			expect(result[0].type).toBe('action');
+			expect((result[0] as Action).content).toBe('The hero draws their sword');
+			expect(result[0].lineNumber).toBe(10);
+		});
+
+		it('should parse mechanics roll with -> separator', () => {
+			const content = 'd: 2d10 -> Strong hit';
+			const result = parser.parseCodeBlock(content, 0);
+
+			expect(result).toHaveLength(1);
+			expect(result[0].type).toBe('mechanics_roll');
+			const roll = result[0] as MechanicsRoll;
+			expect(roll.roll).toBe('2d10');
+			expect(roll.outcome).toBe('Strong hit');
+			expect(roll.success).toBe(true);
+		});
+
+		it('should parse table lookup with -> separator', () => {
+			const content = 'tbl: 1d100 -> 45: A crumbling stone altar';
+			const result = parser.parseCodeBlock(content, 4);
+
+			expect(result).toHaveLength(1);
+			expect(result[0].type).toBe('table_lookup');
+			const table = result[0] as TableLookup;
+			expect(table.roll).toBe('1d100');
+			expect(table.result).toBe('45: A crumbling stone altar');
+		});
+
+		it('should parse generator with -> separator', () => {
+			const content = 'gen: Mythic Name Generator 2d6 -> Shadowfen';
+			const result = parser.parseCodeBlock(content, 6);
+
+			expect(result).toHaveLength(1);
+			expect(result[0].type).toBe('generator');
+			const generator = result[0] as Generator;
+			expect(generator.system).toBe('Mythic Name Generator 2d6');
+			expect(generator.result).toBe('Shadowfen');
+		});
+
+		it('should parse mixed old and new notation in the same block', () => {
+			const content = `@ Hero attacks with new notation
+> Companion defends with old notation
+d: 2d10 -> Strong hit
+d: 1d20 => Critical success
+tbl: 1d100 -> 42: New style result
+gen: Mythic => Old style result
+=> Consequence stays the same`;
+
+			const result = parser.parseCodeBlock(content, 0);
+
+			expect(result).toHaveLength(7);
+			expect(result[0].type).toBe('action');
+			expect((result[0] as Action).content).toBe('Hero attacks with new notation');
+			expect(result[1].type).toBe('action');
+			expect((result[1] as Action).content).toBe('Companion defends with old notation');
+			expect(result[2].type).toBe('mechanics_roll');
+			expect((result[2] as MechanicsRoll).outcome).toBe('Strong hit');
+			expect(result[3].type).toBe('mechanics_roll');
+			expect((result[3] as MechanicsRoll).outcome).toBe('Critical success');
+			expect(result[4].type).toBe('table_lookup');
+			expect((result[4] as TableLookup).result).toBe('42: New style result');
+			expect(result[5].type).toBe('generator');
+			expect((result[5] as Generator).result).toBe('Old style result');
+			expect(result[6].type).toBe('consequence');
+		});
+
+		it('should prefer -> over => when both present in a mechanics roll', () => {
+			const content = 'd: 2d10 -> outcome => not this';
+			const result = parser.parseCodeBlock(content, 0);
+
+			const roll = result[0] as MechanicsRoll;
+			expect(roll.roll).toBe('2d10');
+			expect(roll.outcome).toBe('outcome => not this');
+		});
+	});
+
 	describe('edge cases', () => {
 		it('should handle empty input', () => {
 			const result = parser.parseCodeBlock('', 0);

@@ -1,8 +1,8 @@
 ### S{{scene_number}} *{{scene_context}}*
 
 ```
-> {{action}}
-d: {{roll}} => {{outcome}}
+@ {{action}}
+d: {{roll}} -> {{outcome}}
 => {{consequence}}
 
 ? {{question}}

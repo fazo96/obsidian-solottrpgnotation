@@ -106,7 +106,7 @@ export class DashboardView extends ItemView {
 
 	private renderCampaignScreen(container: HTMLElement) {
 		const header = container.createDiv({ cls: 'solo-rpg-header' });
-		header.createEl('h2', { text: 'Solo RPG Campaigns', cls: 'solo-rpg-title' });
+		header.createEl('h2', { text: 'Lonelog Campaigns', cls: 'solo-rpg-title' });
 
 		const refreshBtn = header.createEl('button', {
 			text: '🔄 Refresh',

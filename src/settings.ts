@@ -69,7 +69,7 @@ export class SoloRPGSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		// Header
-		containerEl.createEl('h2', { text: 'Solo RPG Notation Settings' });
+		containerEl.createEl('h2', { text: 'Lonelog Settings' });
 
 		// General Section
 		containerEl.createEl('h3', { text: 'General' });

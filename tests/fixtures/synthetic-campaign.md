@@ -92,3 +92,20 @@ The party rests in the clearing
 
 > Prepare a protective ward
 ```
+
+### S4 *Lonelog-style notation*
+```
+@ Cast a ward of protection
+d: 2d6+2 -> Weak hit (4, 2)
+=> The ward holds, but drains energy
+
+? Does the forest respond?
+-> Yes, the trees begin to glow
+
+tbl: d100=77 -> "Ancient runes appear on the bark"
+gen: Mythic Action -> Reveal Secrets
+
+@ Touch the glowing rune
+d: 1d20 -> Success (15)
+=> The rune reveals a hidden path
+```

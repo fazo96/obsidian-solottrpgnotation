@@ -16,6 +16,22 @@ import {
  */
 export class CodeBlockParser {
 	/**
+	 * Split content by resolution arrow: try '->' first, fall back to '=>'
+	 * Used for mechanics rolls, table lookups, and generators
+	 */
+	private splitByResolutionArrow(content: string): [string, string] {
+		const arrowIdx = content.indexOf('->');
+		if (arrowIdx !== -1) {
+			return [content.substring(0, arrowIdx).trim(), content.substring(arrowIdx + 2).trim()];
+		}
+		const fatArrowIdx = content.indexOf('=>');
+		if (fatArrowIdx !== -1) {
+			return [content.substring(0, fatArrowIdx).trim(), content.substring(fatArrowIdx + 2).trim()];
+		}
+		return [content.trim(), ''];
+	}
+
+	/**
 	 * Parse a code block and extract notation elements
 	 */
 	parseCodeBlock(content: string, startLine: number): NotationElement[] {
@@ -30,7 +46,7 @@ export class CodeBlockParser {
 			if (!line) continue;
 
 			// Parse based on prefix
-			if (line.startsWith('> ')) {
+			if (line.startsWith('@ ') || line.startsWith('> ')) {
 				elements.push(this.parseAction(line, lineNumber));
 			} else if (line.startsWith('?')) {
 				elements.push(this.parseOracleQuestion(line, lineNumber));
@@ -66,7 +82,8 @@ export class CodeBlockParser {
 	 * Parse action line (> action)
 	 */
 	private parseAction(line: string, lineNumber: number): Action {
-		const content = line.substring(1).trim(); // Remove '>'
+		const prefix = line.startsWith('@ ') ? '@' : '>';
+		const content = line.substring(prefix.length).trim();
 		return {
 			type: 'action',
 			content,
@@ -92,10 +109,8 @@ export class CodeBlockParser {
 	private parseMechanicsRoll(line: string, lineNumber: number): MechanicsRoll {
 		const content = line.substring(2).trim(); // Remove 'd:'
 
-		// Split by '=>'
-		const parts = content.split('=>').map(p => p.trim());
-		const roll = parts[0] || '';
-		const outcome = parts[1] || '';
+		// Split by '->' first, fall back to '=>'
+		const [roll, outcome] = this.splitByResolutionArrow(content);
 
 		// Try to determine success
 		const success = this.determineSuccess(outcome);
@@ -146,10 +161,8 @@ export class CodeBlockParser {
 	private parseTableLookup(line: string, lineNumber: number): TableLookup {
 		const content = line.substring(4).trim(); // Remove 'tbl:'
 
-		// Split by '=>'
-		const parts = content.split('=>').map(p => p.trim());
-		const roll = parts[0] || '';
-		const result = parts[1] || '';
+		// Split by '->' first, fall back to '=>'
+		const [roll, result] = this.splitByResolutionArrow(content);
 
 		return {
 			type: 'table_lookup',
@@ -165,10 +178,8 @@ export class CodeBlockParser {
 	private parseGenerator(line: string, lineNumber: number): Generator {
 		const content = line.substring(4).trim(); // Remove 'gen:'
 
-		// Split by '=>'
-		const parts = content.split('=>').map(p => p.trim());
-		const beforeArrow = parts[0] || '';
-		const result = parts[1] || '';
+		// Split by '->' first, fall back to '=>'
+		const [beforeArrow, result] = this.splitByResolutionArrow(content);
 
 		// Try to extract system name and rolls
 		// Format: "System roll1 roll2 => result"

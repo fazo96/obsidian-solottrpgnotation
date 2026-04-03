@@ -1,5 +1,5 @@
 /**
- * Type definitions for Solo RPG Notation system
+ * Type definitions for Lonelog notation system
  */
 
 // ========== Location in document ==========

@@ -5,7 +5,7 @@ import { TagExtractor } from './TagExtractor';
 import { ProgressParser } from './ProgressParser';
 
 /**
- * Main parser for Solo RPG Notation campaign files
+ * Main parser for Lonelog notation campaign files
  */
 export class NotationParser {
 	private app: App | undefined;

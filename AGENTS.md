@@ -1,4 +1,4 @@
-# Solo TTRPG Notation Plugin - Developer Guide
+# Lonelog Plugin - Developer Guide
 
 This guide provides essential information for agentic coding agents working on this Obsidian plugin.
 

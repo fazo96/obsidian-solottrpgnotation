@@ -1,5 +1,5 @@
 /**
- * Snippet definitions for Solo RPG Notation
+ * Snippet definitions for Lonelog notation
  */
 
 export interface Snippet {
@@ -13,7 +13,7 @@ export const SNIPPETS: Snippet[] = [
 	{
 		trigger: 'action',
 		description: 'Player action sequence',
-		content: '> ${1:action}\nd: ${2:roll} => ${3:outcome}\n=> ${4:consequence}',
+		content: '@ ${1:action}\nd: ${2:roll} -> ${3:outcome}\n=> ${4:consequence}',
 	},
 	{
 		trigger: 'oracle',
@@ -23,7 +23,7 @@ export const SNIPPETS: Snippet[] = [
 	{
 		trigger: 'combined',
 		description: 'Combined action and oracle',
-		content: '> ${1:action}\nd: ${2:roll} => ${3:outcome}\n=> ${4:consequence}\n\n? ${5:question}\n-> ${6:answer}\n=> ${7:consequence}',
+		content: '@ ${1:action}\nd: ${2:roll} -> ${3:outcome}\n=> ${4:consequence}\n\n? ${5:question}\n-> ${6:answer}\n=> ${7:consequence}',
 	},
 
 	// Tags
@@ -112,12 +112,12 @@ export const SNIPPETS: Snippet[] = [
 	{
 		trigger: 'table',
 		description: 'Table lookup',
-		content: 'tbl: d${1:100}=${2:result} => "${3:outcome}"',
+		content: 'tbl: d${1:100}=${2:result} -> "${3:outcome}"',
 	},
 	{
 		trigger: 'generator',
 		description: 'Complex generator',
-		content: 'gen: ${1:system} => ${2:result}',
+		content: 'gen: ${1:system} -> ${2:result}',
 	},
 ];
 

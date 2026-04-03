@@ -1,10 +1,10 @@
-# Solo TTRPG Notation
+# Lonelog (Solo TTRPG Notation)
 
 A plugin for recording and tracking solo tabletop RPG sessions using a standardized notation system.
 
-## What is Solo TTRPG Notation?
+## What is Lonelog?
 
-Solo TTRPG Notation is a lightweight text-based system for documenting your solo TTRPG sessions. It lets you:
+Lonelog (formerly Solo TTRPG Notation) is a lightweight text-based system for documenting your solo TTRPG sessions. It lets you:
 
 - Record actions, oracle questions, and dice rolls in a consistent format
 - Tag NPCs, locations, and story threads as they appear
@@ -81,8 +81,8 @@ All notation goes inside code blocks (triple backticks). Outside the code blocks
 ### S1 *Dark alley, midnight*
 
 ```
-> Sneak past the guards
-d: Stealth d6=4 vs TN 5 => Fail
+@ Sneak past the guards
+d: Stealth d6=4 vs TN 5 -> Fail
 => My foot kicks a barrel. [E:AlertClock 1/6]
 
 ? Do they see me?
@@ -93,8 +93,8 @@ d: Stealth d6=4 vs TN 5 => Fail
 The guard's torch sweeps across the alley. I press myself against the wall.
 
 ```
-> Wait for them to pass
-tbl: d100=42 => "A distant scream distracts them"
+@ Wait for them to pass
+tbl: d100=42 -> "A distant scream distracts them"
 => Perfect timing. [Thread:Investigation|Open]
 ```
 ````
@@ -109,11 +109,13 @@ Click the dice icon (🎲) in the left sidebar to open the Campaign Dashboard, o
 
 | Symbol | Meaning | Example |
 |--------|---------|---------|
-| `>` | Player action | `> Attack the orc` |
+| `@` | Player action | `@ Attack the orc` |
 | `?` | Oracle question | `? Is the door locked?` |
-| `d:` | Mechanics/dice roll | `d: Attack d20=15 vs AC 14 => Hit` |
-| `->` | Oracle result | `-> Yes, and... (d6=6)` |
-| `=>` | Consequence/outcome | `=> The door splinters open` |
+| `d:` | Mechanics/dice roll | `d: Attack d20=15 vs AC 14 -> Hit` |
+| `->` | Resolution (oracle/dice) | `-> Yes, and... (d6=6)` |
+| `=>` | Consequence | `=> The door splinters open` |
+
+> **Retrocompatibility:** The old-style notation (`>` for actions, `=>` as dice outcome separator) is still fully supported. Both old and new styles can be mixed freely.
 
 ### Tags & Trackers
 
@@ -157,14 +159,14 @@ Click the dice icon (🎲) in the left sidebar to open the Campaign Dashboard, o
 
 #### Table Lookups
 ```
-tbl: d100=42 => "A merchant arrives"
-tbl: Weather=Rain => "Heavy downpour begins"
+tbl: d100=42 -> "A merchant arrives"
+tbl: Weather=Rain -> "Heavy downpour begins"
 ```
 
 #### Generators
 ```
-gen: Mythic => "Gratify Fears"
-gen: MUNE => "And also... (Positive)"
+gen: Mythic -> "Gratify Fears"
+gen: MUNE -> "And also... (Positive)"
 ```
 
 ### Meta Notes
@@ -259,7 +261,7 @@ Filter by category and search across all notes.
 
 ## Configuration
 
-Open **Settings → Solo TTRPG Notation** to configure:
+Open **Settings → Lonelog** to configure:
 
 ### General
 - Enable/disable automatic indexing
@@ -330,13 +332,13 @@ Open **Settings → Solo TTRPG Notation** to configure:
 
 ## Support
 
-- **Issues & Bugs**: [GitHub Issues](https://github.com/roberto-b/solorpgnotation/issues)
-- **Notation Spec**: See [Solo TTRPG Notation](https://zeruhur.itch.io/solo-ttrpg-notation)
+- **Issues & Bugs**: [GitHub Issues](https://github.com/zeruhur/lonelog/issues)
+- **Notation Spec**: See [Lonelog](https://zeruhur.itch.io/lonelog)
 - **Examples**: Check the `examples/` folder for sample campaigns
 
 ## Credits
 
-This plugin implements the [Solo TTRPG Notation](https://github.com/roberto-b/solorpgnotation) system (v2.0).
+This plugin implements [Lonelog](https://github.com/zeruhur/lonelog) (formerly Solo TTRPG Notation).
 
 The notation system is inspired by the [Sigil Standard](https://alfredvalley.itch.io/the-sigil-standard).
 
